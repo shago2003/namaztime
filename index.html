@@ -51,7 +51,7 @@
         /* --- ГЛАВНЫЙ ЭКРАН (HERO) --- */
         .hero-card {
             text-align: center; color: white; padding: 40px 20px;
-            background: linear-gradient(135deg, #007AFF, #5AC8FA); /* По умолчанию */
+            background: linear-gradient(135deg, #007AFF, #5AC8FA);
             transition: background 1s ease;
         }
         .hero-icon { font-size: 80px; margin-bottom: 15px; display: block; text-shadow: 0 4px 10px rgba(0,0,0,0.2); }
@@ -78,6 +78,7 @@
             background: var(--accent-color); border: none; color: white;
             font-size: 28px; box-shadow: 0 10px 30px rgba(0,122,255,0.4);
             cursor: pointer; transition: transform 0.1s; display: flex; align-items: center; justify-content: center; margin: 0 auto;
+            flex-direction: column;
         }
         .tasbih-btn:active { transform: scale(0.95); }
         .reset-btn { margin-top: 30px; background: none; border: none; color: var(--secondary-text); font-size: 16px; padding: 10px; cursor: pointer;}
@@ -204,7 +205,7 @@
         <div class="card">
             <button class="btn-full" onclick="getLocation('gps')">📍 GPS (Авто)</button>
             <div style="margin-top: 10px; display: flex; gap: 10px;">
-                <input type="text" id="cityInput" class="input-city" placeholder="Город (напр. Baku)">
+                <input type="text" id="cityInput" class="input-city" placeholder="Город (напр. Baku, Moscow)">
                 <button class="btn-full" style="width: 80px; margin-top:0" onclick="getLocation('city')">OK</button>
             </div>
         </div>
@@ -305,7 +306,19 @@
             if(!notificationsEnabled) return;
             const time = document.getElementById('alarmTime').value;
             if(!time) return alert("Выберите время!");
-            tg.sendData(JSON.stringify({ action: 'set_alarm', time: time }));
+            
+            // !!! ВАЖНО: ОТПРАВЛЯЕМ ЧАСОВОЙ ПОЯС !!!
+            const offset = new Date().getTimezoneOffset();
+            
+            tg.sendData(JSON.stringify({ 
+                action: 'set_alarm', 
+                time: time,
+                offset: offset 
+            }));
+            
+            // Визуальное подтверждение
+            if(tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
+            tg.close(); // Закрываем окно после установки
         }
 
         // --- API И ВИЗУАЛ ---
@@ -329,7 +342,8 @@
         }
 
         async function fetchByCity(city) {
-            const url = `https://api.aladhan.com/v1/timingsByCity?city=${city}&country=Azerbaijan&method=3`;
+            // Используем timingsByAddress чтобы работало для ВСЕХ стран (не только Azerbaijan)
+            const url = `https://api.aladhan.com/v1/timingsByAddress?address=${city}&method=3`;
             loadData(url, city);
         }
 
@@ -340,7 +354,10 @@
                 currentTimings = data.data.timings || data.data.data.timings;
                 document.getElementById('locationBadge').innerText = "📍 " + locName;
                 renderAll();
-            } catch(e) { console.error(e); }
+            } catch(e) { 
+                console.error(e); 
+                document.getElementById('locationBadge').innerText = "❌ Ошибка";
+            }
         }
 
         function renderAll() {

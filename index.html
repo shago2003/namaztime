@@ -8,64 +8,58 @@
     <style>
         :root { --bg-color: #F2F2F7; --card-bg: #FFFFFF; --text-color: #000000; --accent-color: #007AFF; }
         [data-theme="dark"] { --bg-color: #000000; --card-bg: #1C1C1E; --text-color: #FFFFFF; --accent-color: #0A84FF; }
-        body { font-family: sans-serif; background: var(--bg-color); color: var(--text-color); margin: 0; padding-bottom: 90px; }
+        body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; background: var(--bg-color); color: var(--text-color); margin: 0; padding-bottom: 90px; }
         .container { display: none; padding: 20px; }
         .container.active { display: block; }
-        .card { background: var(--card-bg); border-radius: 16px; padding: 20px; margin-bottom: 15px; }
-        
-        /* ГЛАВНЫЙ ЭКРАН */
-        .hero-card { text-align: center; color: white; padding: 40px 20px; background: linear-gradient(135deg, #007AFF, #5AC8FA); border-radius: 16px; margin: 20px; }
-        .hero-time { font-size: 50px; font-weight: 800; }
-        
-        /* СПИСОК */
-        .prayer-row { display: flex; justify-content: space-between; align-items: center; padding: 15px 0; border-bottom: 1px solid #ccc; }
-        .prayer-name { font-weight: 600; }
-        .prayer-right { display: flex; align-items: center; gap: 10px; }
-        .bell-btn { background: none; border: none; font-size: 20px; cursor: pointer; opacity: 0.5; transition: 0.2s; }
-        .bell-btn.active { opacity: 1; transform: scale(1.2); }
-
-        /* МЕНЮ */
-        .tab-bar { position: fixed; bottom: 0; width: 100%; background: var(--card-bg); display: flex; height: 60px; border-top: 1px solid #ccc; }
-        .tab-btn { flex: 1; border: none; background: none; color: #888; font-size: 24px; }
+        .card { background: var(--card-bg); border-radius: 16px; padding: 20px; margin-bottom: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        .btn-full { width: 100%; padding: 15px; background: var(--accent-color); color: white; border: none; border-radius: 12px; font-size: 16px; font-weight: 600; margin-top: 10px; cursor: pointer; }
+        .hero-card { text-align: center; color: white; padding: 40px 20px; background: linear-gradient(135deg, #007AFF, #5AC8FA); border-radius: 16px; margin-bottom: 20px; }
+        .prayer-row { display: flex; justify-content: space-between; padding: 15px 0; border-bottom: 1px solid #ccc; }
+        .tab-bar { position: fixed; bottom: 0; width: 100%; height: 60px; background: var(--card-bg); display: flex; justify-content: space-around; border-top: 1px solid #ccc; z-index: 100;}
+        .tab-btn { background: none; border: none; font-size: 24px; color: #888; }
         .tab-btn.active { color: var(--accent-color); }
     </style>
 </head>
 <body>
 
     <div id="tab-home" class="container active">
-        <h1 style="text-align:center; margin-top:0;">Muslim App</h1>
-        <div class="hero-card">
-            <div style="font-size:60px;">🕌</div>
-            <div>Следующий намаз:</div>
-            <div class="hero-time" id="nextTime">--:--</div>
+        <h1>Ассаляму алейкум</h1>
+        <div class="card hero-card">
+            <div style="font-size:50px;">🕌</div>
+            <div>Следующий намаз</div>
+            <div style="font-size:40px; font-weight:800;" id="nextTime">--:--</div>
             <div id="nextName">Загрузка...</div>
-            <div id="locationBadge" style="margin-top:10px; font-size:12px; opacity:0.8;">📍 Поиск...</div>
+            <div id="locationBadge" style="font-size:12px; opacity:0.8; margin-top:10px;">📍 ...</div>
         </div>
-
-        <div class="card">
-            <h3 style="margin-top:0;">Расписание на сегодня</h3>
-            <div id="scheduleList"></div>
-        </div>
+        <div class="card" id="scheduleList"></div>
     </div>
 
     <div id="tab-tasbih" class="container">
         <h1 style="text-align:center">Тасбих</h1>
         <div class="card" style="text-align:center; padding: 50px 20px;">
             <div id="tasbihCount" style="font-size: 80px; font-weight:bold;">0</div>
-            <button onclick="countTasbih()" style="width:100%; padding:20px; background:var(--accent-color); color:white; border:none; border-radius:12px; font-size:20px; margin-top:20px;">Нажать</button>
-            <button onclick="resetTasbih()" style="margin-top:20px; background:none; border:none; color:red;">Сбросить</button>
+            <button class="btn-full" onclick="countTasbih()">Нажать 👆</button>
+            <button style="background:none; border:none; color:red; margin-top:20px;" onclick="resetTasbih()">Сбросить</button>
         </div>
     </div>
 
     <div id="tab-settings" class="container">
         <h1>Настройки</h1>
+        
         <div class="card">
-            <p>Локация: <span id="currentCity">Авто</span></p>
-            <button onclick="getLocation()" style="width:100%; padding:10px; background:var(--accent-color); color:white; border-radius:8px; border:none;">🔄 Обновить GPS</button>
+            <h3>🔔 Уведомления (Автопилот)</h3>
+            <p style="font-size:14px; color:gray;">Нажмите кнопку ниже ОДИН РАЗ. Бот запомнит ваш город и будет присылать время намаза каждый день автоматически.</p>
+            <button class="btn-full" onclick="syncLocation()">🔄 Включить Авто-Уведомления</button>
         </div>
+
         <div class="card">
-            <p>Тест уведомлений:</p>
-            <button onclick="sendTest()" style="width:100%; padding:10px; background:#34C759; color:white; border-radius:8px; border:none;">🔔 Отправить тест</button>
+            <h3>📍 Локация</h3>
+            <div id="currentCitySettings">Авто (GPS)</div>
+            <button class="btn-full" style="background:#8E8E93" onclick="getLocation()">Обновить GPS</button>
+        </div>
+        
+        <div class="card">
+             <button class="btn-full" style="background:#34C759" onclick="sendTest()">🔔 Тест (Проверка)</button>
         </div>
     </div>
 
@@ -79,23 +73,25 @@
         const tg = window.Telegram.WebApp;
         tg.expand();
         let tasbih = localStorage.getItem('tasbih') || 0;
-        let currentTimings = {};
-        
+        let currentLat = 0, currentLon = 0;
+
         function init() {
             document.getElementById('tasbihCount').innerText = tasbih;
             getLocation();
         }
 
-        // --- ЛОКАЦИЯ И API ---
         function getLocation() {
-            document.getElementById('locationBadge').innerText = "⏳ Обновление...";
+            document.getElementById('locationBadge').innerText = "⏳ ...";
             navigator.geolocation.getCurrentPosition(
-                pos => loadTimings(pos.coords.latitude, pos.coords.longitude),
+                pos => {
+                    currentLat = pos.coords.latitude;
+                    currentLon = pos.coords.longitude;
+                    loadTimings(currentLat, currentLon);
+                },
                 err => {
-                    // Если нет GPS, пробуем Баку по умолчанию
-                    fetch(`https://api.aladhan.com/v1/timingsByCity?city=Baku&country=Azerbaijan&method=3`)
-                        .then(res => res.json())
-                        .then(data => renderTimings(data.data.timings, "Baku (Default)"));
+                    // Баку по умолчанию
+                    currentLat = 40.4093; currentLon = 49.8671;
+                    loadTimings(currentLat, currentLon);
                 }
             );
         }
@@ -104,94 +100,57 @@
             const date = Math.floor(Date.now() / 1000);
             fetch(`https://api.aladhan.com/v1/timings/${date}?latitude=${lat}&longitude=${lon}&method=3`)
                 .then(res => res.json())
-                .then(data => renderTimings(data.data.timings, "GPS Локация"));
+                .then(data => renderTimings(data.data.timings));
         }
 
-        function renderTimings(timings, locName) {
-            currentTimings = timings;
-            document.getElementById('locationBadge').innerText = "📍 " + locName;
-            
+        function renderTimings(timings) {
+            document.getElementById('locationBadge').innerText = "📍 GPS Активен";
             const list = document.getElementById('scheduleList');
             list.innerHTML = "";
-            
             const names = {Fajr:"Фаджр", Sunrise:"Восход", Dhuhr:"Зухр", Asr:"Аср", Maghrib:"Магриб", Isha:"Иша"};
-            const keys = ['Fajr', 'Sunrise', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'];
             
-            // Определяем следующий намаз
             const now = new Date();
             const nowMins = now.getHours() * 60 + now.getMinutes();
-            let nextKey = "Fajr";
-            let foundNext = false;
+            let nextFound = false;
 
-            keys.forEach(key => {
+            for (let key in names) {
                 const time = timings[key];
+                list.innerHTML += `<div class="prayer-row"><span>${names[key]}</span><span style="font-weight:600; color:#007AFF">${time}</span></div>`;
                 
-                // --- ГЛАВНОЕ: КНОПКА-КОЛОКОЛЬЧИК ---
-                // При нажатии отправляем этот намаз боту
-                const row = `
-                    <div class="prayer-row">
-                        <span class="prayer-name">${names[key]}</span>
-                        <div class="prayer-right">
-                            <span>${time}</span>
-                            <button class="bell-btn" onclick="setAlarm('${time}', '${names[key]}', this)">🔔</button>
-                        </div>
-                    </div>
-                `;
-                list.innerHTML += row;
-
-                // Логика следующего намаза
                 const [h, m] = time.split(':').map(Number);
-                if (!foundNext && (h*60+m) > nowMins) {
-                    nextKey = key; 
-                    foundNext = true;
+                if (!nextFound && (h*60+m) > nowMins) {
                     document.getElementById('nextTime').innerText = time;
                     document.getElementById('nextName').innerText = names[key];
+                    nextFound = true;
                 }
-            });
-            
-            if(!foundNext) {
-                // Если все прошли, показываем Фаджр завтра
+            }
+            if(!nextFound) {
                 document.getElementById('nextTime').innerText = timings['Fajr'];
                 document.getElementById('nextName').innerText = "Фаджр (Завтра)";
             }
         }
 
-        // --- ОТПРАВКА БУДИЛЬНИКА БОТУ ---
-        function setAlarm(time, name, btn) {
-            // Визуально включаем колокольчик
-            btn.classList.add('active');
-            btn.innerText = "✅";
+        // --- ГЛАВНАЯ ФУНКЦИЯ: ОТПРАВИТЬ ЛОКАЦИЮ БОТУ ---
+        function syncLocation() {
+            if(currentLat === 0) return alert("Сначала дождитесь определения GPS!");
             
-            // Отправляем боту
             const offset = new Date().getTimezoneOffset();
             tg.sendData(JSON.stringify({ 
-                action: 'set_alarm', 
-                time: time, 
+                action: 'sync_location', 
+                lat: currentLat, 
+                lon: currentLon, 
                 offset: offset 
             }));
-            
-            // Вибрация
-            if(tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
-            
-            // Закрываем, чтобы пользователь увидел сообщение в чате
-            setTimeout(() => {
-               tg.close();
-            }, 500);
         }
 
-        function sendTest() {
-            tg.sendData(JSON.stringify({ action: 'test_notification' }));
-        }
-
-        // --- ТАСБИХ И ВКЛАДКИ ---
+        function sendTest() { tg.sendData(JSON.stringify({ action: 'test_notification' })); }
+        
         function countTasbih() {
-            tasbih++;
-            document.getElementById('tasbihCount').innerText = tasbih;
+            tasbih++; document.getElementById('tasbihCount').innerText = tasbih;
             localStorage.setItem('tasbih', tasbih);
             if(tg.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
         }
         function resetTasbih() { tasbih=0; document.getElementById('tasbihCount').innerText=0; localStorage.setItem('tasbih',0); }
-        
         function switchTab(name, btn) {
             document.querySelectorAll('.container').forEach(el => el.classList.remove('active'));
             document.getElementById('tab-'+name).classList.add('active');

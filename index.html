@@ -6,13 +6,14 @@
     <title>Muslim App</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        /* --- Стили те же, добавил пару новых --- */
         :root {
             --bg-color: #F2F2F7;
             --card-bg: #FFFFFF;
             --text-color: #000000;
             --secondary-text: #8E8E93;
             --accent-color: #007AFF;
+            --danger-color: #FF3B30;
+            --success-color: #34C759;
             --tab-bar-bg: #FFFFFF;
             --border-color: #E5E5EA;
         }
@@ -31,44 +32,28 @@
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             background-color: var(--bg-color);
             color: var(--text-color);
-            margin: 0;
-            padding: 0;
-            padding-bottom: 90px;
-            transition: background-color 0.3s, color 0.3s;
-            overflow-x: hidden;
-            -webkit-tap-highlight-color: transparent;
+            margin: 0; padding: 0; padding-bottom: 90px;
+            overflow-x: hidden; -webkit-tap-highlight-color: transparent;
         }
 
-        .container { display: none; animation: fadeIn 0.3s ease; padding: 20px; }
+        .container { display: none; padding: 20px; animation: fadeIn 0.3s ease; }
         .container.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
         .card {
-            background: var(--card-bg);
-            border-radius: 16px;
-            padding: 20px;
-            margin-bottom: 15px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            background: var(--card-bg); border-radius: 16px; padding: 20px;
+            margin-bottom: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.05);
         }
 
         h1 { font-size: 28px; font-weight: 700; margin: 10px 0 20px 0; }
-        h2 { font-size: 20px; font-weight: 600; margin-bottom: 15px; margin-top: 10px; }
+        h2 { font-size: 18px; font-weight: 600; margin-bottom: 10px; margin-top: 5px; color: var(--secondary-text); text-transform: uppercase; letter-spacing: 0.5px; }
 
-        /* HERO CARD */
+        /* HERO & LISTS */
         .hero-card {
             text-align: center; color: white; padding: 40px 20px;
             background: linear-gradient(135deg, #007AFF, #5AC8FA);
-            transition: background 1s ease;
         }
-        .hero-icon { font-size: 60px; margin-bottom: 10px; display: block; }
-        .hero-label { font-size: 16px; opacity: 0.9; text-transform: uppercase; letter-spacing: 1px; }
         .hero-time { font-size: 48px; font-weight: 800; margin: 10px 0; }
-        .location-badge { 
-            display: inline-block; background: rgba(255,255,255,0.2); 
-            padding: 4px 12px; border-radius: 20px; font-size: 13px; backdrop-filter: blur(5px);
-        }
-
-        /* LISTS */
         .prayer-row {
             display: flex; justify-content: space-between; padding: 16px 0;
             border-bottom: 1px solid var(--border-color); font-size: 17px;
@@ -76,48 +61,51 @@
         .prayer-row:last-child { border-bottom: none; }
         .prayer-time { font-weight: 600; color: var(--accent-color); }
 
-        /* TASBIH */
-        .tasbih-container { text-align: center; padding-top: 40px; }
-        .counter-display { font-size: 80px; font-weight: 700; font-variant-numeric: tabular-nums; margin: 20px 0; }
-        .tasbih-btn {
-            width: 200px; height: 200px; border-radius: 50%;
-            background: var(--accent-color); border: none; color: white;
-            font-size: 24px; box-shadow: 0 10px 30px rgba(0,122,255,0.3);
-            cursor: pointer; transition: transform 0.1s;
-        }
-        .tasbih-btn:active { transform: scale(0.95); }
-        .reset-btn { margin-top: 30px; background: none; border: none; color: var(--secondary-text); font-size: 16px; padding: 10px; }
-
-        /* SETTINGS & INPUTS */
+        /* INPUTS & BUTTONS */
         .setting-item {
             display: flex; justify-content: space-between; align-items: center;
             padding: 16px 0; border-bottom: 1px solid var(--border-color);
         }
-        .input-city, .input-time {
-            background: var(--bg-color); border: 1px solid var(--border-color);
-            color: var(--text-color); padding: 10px; border-radius: 8px; 
-            font-size: 16px; width: 100%; box-sizing: border-box;
-        }
-        .btn-small {
+        .setting-item:last-child { border-bottom: none; }
+        
+        .btn-full {
             background: var(--accent-color); color: white; border: none;
-            padding: 12px 16px; border-radius: 8px; font-size: 15px; cursor: pointer;
-            width: 100%; margin-top: 10px; font-weight: 600;
+            padding: 14px; border-radius: 12px; font-size: 16px; font-weight: 600;
+            width: 100%; cursor: pointer; margin-top: 10px;
         }
-        .btn-test {
-            background-color: #34C759; /* Green */
+        .btn-full:disabled {
+            background-color: var(--secondary-text); opacity: 0.5; cursor: not-allowed;
         }
+        .btn-test { background-color: var(--success-color); }
+        .input-time {
+            background: var(--bg-color); border: 1px solid var(--border-color);
+            color: var(--text-color); padding: 12px; border-radius: 8px; 
+            font-size: 16px; width: 100%; box-sizing: border-box; display: block;
+        }
+
+        /* TOGGLE SWITCH */
+        .switch { position: relative; display: inline-block; width: 50px; height: 30px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider {
+            position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #ccc; transition: .4s; border-radius: 34px;
+        }
+        .slider:before {
+            position: absolute; content: ""; height: 26px; width: 26px;
+            left: 2px; bottom: 2px; background-color: white; transition: .4s; border-radius: 50%;
+        }
+        input:checked + .slider { background-color: var(--success-color); }
+        input:checked + .slider:before { transform: translateX(20px); }
 
         /* TAB BAR */
         .tab-bar {
             position: fixed; bottom: 0; left: 0; width: 100%;
             background: var(--tab-bar-bg); border-top: 1px solid var(--border-color);
-            display: flex; justify-content: space-around;
-            padding-bottom: env(safe-area-inset-bottom); height: 60px; z-index: 100;
+            display: flex; justify-content: space-around; height: 60px; padding-bottom: env(safe-area-inset-bottom);
         }
         .tab-btn {
-            flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
-            background: none; border: none; color: var(--secondary-text);
-            font-size: 10px; cursor: pointer; padding-top: 5px;
+            flex: 1; background: none; border: none; color: var(--secondary-text);
+            font-size: 10px; display: flex; flex-direction: column; align-items: center; justify-content: center;
         }
         .tab-btn.active { color: var(--accent-color); }
         .tab-icon { font-size: 24px; margin-bottom: 4px; }
@@ -128,249 +116,206 @@
     <div id="tab-home" class="container active">
         <h1>Ассаляму алейкум</h1>
         <div class="card hero-card" id="heroCard">
-            <span class="hero-icon" id="heroIcon">⏳</span>
-            <div class="hero-label">Следующий намаз</div>
+            <span style="font-size:50px" id="heroIcon">⏳</span>
+            <div>Следующий намаз</div>
             <div class="hero-time" id="nextPrayerTime">--:--</div>
-            <div class="hero-label" id="nextPrayerName">Загрузка...</div>
-            <br>
-            <div class="location-badge" id="locationBadge">📍 Поиск...</div>
+            <div id="nextPrayerName">Загрузка...</div>
         </div>
-        <div class="card">
-            <h2 style="margin-top:0">Сегодня</h2>
-            <div id="homeScheduleList">Загрузка...</div>
-        </div>
-    </div>
-
-    <div id="tab-schedule" class="container">
-        <h1>Расписание</h1>
-        <div class="card" id="scheduleList"></div>
-    </div>
-
-    <div id="tab-tasbih" class="container">
-        <h1>Тасбих</h1>
-        <div class="tasbih-container">
-            <div class="counter-display" id="tasbihCount">0</div>
-            <button class="tasbih-btn" onclick="incrementTasbih()">СубханАллах</button>
-            <br>
-            <button class="reset-btn" onclick="resetTasbih()">Сбросить</button>
-        </div>
+        <div class="card" id="homeScheduleList"></div>
     </div>
 
     <div id="tab-settings" class="container">
         <h1>Настройки</h1>
-        
+
         <div class="card">
             <div class="setting-item">
                 <span>Темная тема</span>
-                <input type="checkbox" id="themeToggle" onchange="toggleTheme()">
-            </div>
-            
-            <div style="padding-top: 15px;">
-                 <div style="margin-bottom: 5px;">Проверка уведомлений:</div>
-                 <button class="btn-small btn-test" onclick="sendTestNotification()">🔔 Тест уведомления (Бот)</button>
-                 <div style="font-size: 12px; color: var(--secondary-text); margin-top: 5px;">Приложение закроется, и бот пришлет сообщение.</div>
+                <label class="switch">
+                    <input type="checkbox" id="themeToggle" onchange="toggleTheme()">
+                    <span class="slider"></span>
+                </label>
             </div>
         </div>
 
-        <h2>Напоминания</h2>
+        <h2>Уведомления</h2>
         <div class="card">
-             <div style="margin-bottom: 5px;">Установить свое время:</div>
-             <input type="time" id="alarmTimeInput" class="input-time">
-             <button class="btn-small" onclick="setCustomAlarm()">⏰ Установить напоминание</button>
+            <div class="setting-item">
+                <span style="font-weight: 600;">Включить уведомления</span>
+                <label class="switch">
+                    <input type="checkbox" id="notifToggle" onchange="toggleNotifications()">
+                    <span class="slider"></span>
+                </label>
+            </div>
+            
+            <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border-color);">
+                <div style="margin-bottom: 10px;">Проверка связи с ботом:</div>
+                <button id="btnTest" class="btn-full btn-test" onclick="sendTest()">🔔 Проверить (Тест)</button>
+            </div>
+
+            <div style="margin-top: 20px;">
+                <div style="margin-bottom: 10px;">Напомнить мне в:</div>
+                <input type="time" id="alarmTime" class="input-time">
+                <button id="btnAlarm" class="btn-full" onclick="setAlarm()">⏰ Установить</button>
+            </div>
+            
+            <p style="font-size: 13px; color: var(--secondary-text); margin-top: 10px;">
+                * При нажатии кнопок приложение закроется, и бот пришлет подтверждение.
+            </p>
         </div>
 
         <h2>Локация</h2>
         <div class="card">
-            <button class="btn-small" onclick="getLocation('gps')" style="margin-bottom: 15px;">📍 GPS (Точно)</button>
-            <div style="border-top: 1px solid var(--border-color); padding-top: 15px;">
-                <div style="margin-bottom: 5px;">Или город:</div>
-                <div style="display: flex; gap: 10px;">
-                    <input type="text" id="cityInput" class="input-city" placeholder="Baku">
-                    <button class="btn-small" style="width: auto; margin-top:0;" onclick="getLocation('city')">ОК</button>
-                </div>
+            <button class="btn-full" onclick="getLocation('gps')">📍 GPS (Авто)</button>
+            <div style="margin-top: 10px; display: flex; gap: 10px;">
+                <input type="text" id="cityInput" class="input-time" placeholder="City (e.g. Baku)">
+                <button class="btn-full" style="width: 80px; margin-top:0" onclick="getLocation('city')">OK</button>
             </div>
+            <div id="locationStatus" style="font-size: 13px; color: var(--secondary-text); margin-top: 5px; text-align: center;"></div>
         </div>
     </div>
 
     <div class="tab-bar">
-        <button class="tab-btn active" onclick="switchTab('home', this)">
-            <span class="tab-icon">🏠</span>Главная
-        </button>
-        <button class="tab-btn" onclick="switchTab('schedule', this)">
-            <span class="tab-icon">📅</span>Время
-        </button>
-        <button class="tab-btn" onclick="switchTab('tasbih', this)">
-            <span class="tab-icon">📿</span>Тасбих
-        </button>
-        <button class="tab-btn" onclick="switchTab('settings', this)">
-            <span class="tab-icon">⚙️</span>Настройки
-        </button>
+        <button class="tab-btn active" onclick="switchTab('home', this)"><span class="tab-icon">🏠</span>Главная</button>
+        <button class="tab-btn" onclick="switchTab('settings', this)"><span class="tab-icon">⚙️</span>Настройки</button>
     </div>
 
     <script>
         const tg = window.Telegram.WebApp;
         tg.expand();
 
-        // --- ДАННЫЕ И ИНИЦИАЛИЗАЦИЯ ---
+        // --- GLOBAL VARIABLES ---
+        let notificationsEnabled = localStorage.getItem('notifEnabled') === 'true';
         let currentTimings = null;
-        let tasbihCount = parseInt(localStorage.getItem('tasbih')) || 0;
-        const prayerNamesRu = { Fajr: "Фаджр", Sunrise: "Восход", Dhuhr: "Зухр", Asr: "Аср", Maghrib: "Магриб", Isha: "Иша" };
 
-        document.getElementById('tasbihCount').innerText = tasbihCount;
-        
-        const savedTheme = localStorage.getItem('theme');
-        if (savedTheme === 'dark') {
-            document.body.setAttribute('data-theme', 'dark');
-            document.getElementById('themeToggle').checked = true;
+        // --- INIT ---
+        function init() {
+            // Theme
+            if(localStorage.getItem('theme') === 'dark') {
+                document.body.setAttribute('data-theme', 'dark');
+                document.getElementById('themeToggle').checked = true;
+            }
+            
+            // Notifications Toggle State
+            document.getElementById('notifToggle').checked = notificationsEnabled;
+            updateButtonsState();
+
+            // Location
+            const city = localStorage.getItem('savedCity');
+            if(city) fetchByCity(city); else getLocation('gps');
         }
 
-        const savedCity = localStorage.getItem('savedCity');
-        if (savedCity) {
-            document.getElementById('cityInput').value = savedCity;
-            fetchByCity(savedCity);
-        } else {
-            getLocation('gps');
+        // --- NOTIFICATIONS LOGIC ---
+        function toggleNotifications() {
+            notificationsEnabled = document.getElementById('notifToggle').checked;
+            localStorage.setItem('notifEnabled', notificationsEnabled);
+            updateButtonsState();
+            
+            if(notificationsEnabled) {
+                tg.HapticFeedback.notificationOccurred('success');
+            }
         }
 
-        // --- ЛОГИКА УВЕДОМЛЕНИЙ (ОБЩЕНИЕ С БОТОМ) ---
-        function sendTestNotification() {
-            // Отправляем данные боту. Бот поймает action: 'test_notification'
+        function updateButtonsState() {
+            // Если уведомления ВЫКЛ, кнопки становятся серыми (disabled)
+            document.getElementById('btnTest').disabled = !notificationsEnabled;
+            document.getElementById('btnAlarm').disabled = !notificationsEnabled;
+            document.getElementById('alarmTime').disabled = !notificationsEnabled;
+        }
+
+        function sendTest() {
+            if(!notificationsEnabled) return;
+            // Отправляем данные боту
             const data = JSON.stringify({ action: 'test_notification' });
-            tg.sendData(data); 
+            tg.sendData(data);
         }
 
-        function setCustomAlarm() {
-            const timeVal = document.getElementById('alarmTimeInput').value;
-            if (!timeVal) {
-                alert("Пожалуйста, выберите время");
+        function setAlarm() {
+            if(!notificationsEnabled) return;
+            const timeVal = document.getElementById('alarmTime').value;
+            if(!timeVal) {
+                alert("Выберите время!");
                 return;
             }
-            // Отправляем время боту
             const data = JSON.stringify({ action: 'set_alarm', time: timeVal });
             tg.sendData(data);
         }
 
-        // --- ОСТАЛЬНАЯ ЛОГИКА (Тасбих, Тема, API) ---
-        function switchTab(tabName, btn) {
-            document.querySelectorAll('.container').forEach(el => el.classList.remove('active'));
-            document.getElementById('tab-' + tabName).classList.add('active');
-            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
-            btn.classList.add('active');
-        }
-
-        function incrementTasbih() {
-            tasbihCount++;
-            document.getElementById('tasbihCount').innerText = tasbihCount;
-            localStorage.setItem('tasbih', tasbihCount);
-            if(tg.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
-        }
-
-        function resetTasbih() {
-            if(confirm('Сбросить счетчик?')) {
-                tasbihCount = 0;
-                document.getElementById('tasbihCount').innerText = 0;
-                localStorage.setItem('tasbih', 0);
-                if(tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
-            }
-        }
-
-        function toggleTheme() {
-            if (document.body.getAttribute('data-theme') === 'dark') {
-                document.body.removeAttribute('data-theme');
-                localStorage.setItem('theme', 'light');
-            } else {
-                document.body.setAttribute('data-theme', 'dark');
-                localStorage.setItem('theme', 'dark');
-            }
-        }
-
+        // --- LOCATION & API ---
         function getLocation(type) {
-            document.getElementById('locationBadge').innerText = "⏳ Обновление...";
+            document.getElementById('locationStatus').innerText = "Поиск...";
             if (type === 'gps') {
-                if (navigator.geolocation) {
-                    navigator.geolocation.getCurrentPosition(
-                        (pos) => fetchByCoords(pos.coords.latitude, pos.coords.longitude),
-                        (err) => { alert("Включите GPS."); document.getElementById('locationBadge').innerText = "❌ Нет GPS"; }
-                    );
-                }
-            } else if (type === 'city') {
+                navigator.geolocation.getCurrentPosition(
+                    pos => fetchByCoords(pos.coords.latitude, pos.coords.longitude),
+                    err => alert("GPS недоступен")
+                );
+            } else {
                 const city = document.getElementById('cityInput').value;
-                if(city) {
-                    localStorage.setItem('savedCity', city);
-                    fetchByCity(city);
-                }
+                if(city) { localStorage.setItem('savedCity', city); fetchByCity(city); }
             }
         }
 
         async function fetchByCoords(lat, lon) {
             const date = Math.floor(Date.now() / 1000);
-            const url = `https://api.aladhan.com/v1/timings/${date}?latitude=${lat}&longitude=${lon}&method=3&school=0`;
-            loadData(url, "GPS");
+            const url = `https://api.aladhan.com/v1/timings/${date}?latitude=${lat}&longitude=${lon}&method=3`;
+            loadData(url);
         }
 
         async function fetchByCity(city) {
-            const url = `https://api.aladhan.com/v1/timingsByCity?city=${city}&country=Azerbaijan&method=3&school=0`;
-            loadData(url, city);
+            const url = `https://api.aladhan.com/v1/timingsByCity?city=${city}&country=Azerbaijan&method=3`;
+            loadData(url);
         }
 
-        async function loadData(url, locationName) {
+        async function loadData(url) {
             try {
-                const response = await fetch(url);
-                const data = await response.json();
-                if (data.code === 200) {
-                    currentTimings = data.data.timings || data.data.data.timings;
-                    document.getElementById('locationBadge').innerText = "📍 " + locationName;
-                    renderAll();
-                }
-            } catch (e) {
-                document.getElementById('locationBadge').innerText = "❌ Ошибка сети";
+                const res = await fetch(url);
+                const data = await res.json();
+                currentTimings = data.data.timings || data.data.data.timings;
+                document.getElementById('locationStatus').innerText = "Обновлено";
+                renderHome();
+            } catch(e) {
+                document.getElementById('locationStatus').innerText = "Ошибка";
             }
         }
 
-        function renderAll() {
-            const list = document.getElementById('scheduleList');
-            const homeList = document.getElementById('homeScheduleList');
-            list.innerHTML = ""; homeList.innerHTML = "";
-            const prayers = ['Fajr', 'Sunrise', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'];
+        function renderHome() {
+            const list = document.getElementById('homeScheduleList');
+            list.innerHTML = "";
+            const ruNames = {Fajr:"Фаджр", Sunrise:"Восход", Dhuhr:"Зухр", Asr:"Аср", Maghrib:"Магриб", Isha:"Иша"};
             
-            prayers.forEach(key => {
-                const row = `<div class="prayer-row"><span>${prayerNamesRu[key]}</span><span class="prayer-time">${currentTimings[key]}</span></div>`;
-                list.innerHTML += row;
-                homeList.innerHTML += row;
-            });
-            updateHero();
-        }
-
-        function updateHero() {
+            // Найти следующий намаз
             const now = new Date();
-            const currentTime = now.getHours() * 60 + now.getMinutes();
-            const prayers = ['Fajr', 'Sunrise', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'];
-            let nextPrayer = 'Fajr'; let nextTimeStr = currentTimings['Fajr']; let foundNext = false;
-
-            for (let key of prayers) {
-                const [h, m] = currentTimings[key].split(':').map(Number);
-                if (h * 60 + m > currentTime) {
-                    nextPrayer = key; nextTimeStr = currentTimings[key]; foundNext = true; break;
-                }
-            }
-            if (!foundNext) { nextPrayer = 'Fajr'; nextTimeStr = currentTimings['Fajr']; }
-
-            document.getElementById('nextPrayerName').innerText = prayerNamesRu[nextPrayer];
-            document.getElementById('nextPrayerTime').innerText = nextTimeStr;
+            const nowMins = now.getHours() * 60 + now.getMinutes();
+            let nextName = "Fajr", nextTime = currentTimings["Fajr"];
             
-            // Фон
-            const card = document.getElementById('heroCard');
-            const icon = document.getElementById('heroIcon');
-            if (nextPrayer === 'Fajr' || nextPrayer === 'Sunrise') {
-                card.style.background = "linear-gradient(135deg, #2c3e50, #4ca1af)"; icon.innerText = "🌙";
-            } else if (nextPrayer === 'Dhuhr' || nextPrayer === 'Asr') {
-                card.style.background = "linear-gradient(135deg, #56CCF2, #2F80ED)"; icon.innerText = "☀️";
-            } else if (nextPrayer === 'Maghrib') {
-                card.style.background = "linear-gradient(135deg, #f12711, #f5af19)"; icon.innerText = "🌅";
-            } else {
-                card.style.background = "linear-gradient(135deg, #141E30, #243B55)"; icon.innerText = "🌌";
-            }
+            ['Fajr','Sunrise','Dhuhr','Asr','Maghrib','Isha'].forEach(key => {
+                const time = currentTimings[key];
+                list.innerHTML += `<div class="prayer-row"><span>${ruNames[key]}</span><span class="prayer-time">${time}</span></div>`;
+                
+                const [h, m] = time.split(':').map(Number);
+                if ((h*60+m) > nowMins && nextName === "Fajr") {
+                    nextName = key; nextTime = time;
+                }
+            });
+            
+            document.getElementById('nextPrayerName').innerText = ruNames[nextName];
+            document.getElementById('nextPrayerTime').innerText = nextTime;
         }
+
+        // --- TABS ---
+        function switchTab(tab, btn) {
+            document.querySelectorAll('.container').forEach(e => e.classList.remove('active'));
+            document.getElementById('tab-'+tab).classList.add('active');
+            document.querySelectorAll('.tab-btn').forEach(e => e.classList.remove('active'));
+            btn.classList.add('active');
+        }
+
+        function toggleTheme() {
+            const isDark = document.body.getAttribute('data-theme') === 'dark';
+            document.body.setAttribute('data-theme', isDark ? 'light' : 'dark');
+            localStorage.setItem('theme', isDark ? 'light' : 'dark');
+        }
+
+        init();
     </script>
 </body>
 </html>

@@ -7,12 +7,12 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         :root {
-            --bg-color: #F2F2F7; /* Apple серый фон */
+            --bg-color: #F2F2F7;
             --card-bg: #FFFFFF;
             --text-color: #000000;
             --secondary-text: #8E8E93;
-            --accent-color: #007AFF; /* Apple Blue */
-            --success-color: #34C759; /* Apple Green */
+            --accent-color: #007AFF;
+            --success-color: #34C759;
             --danger-color: #FF3B30;
             --border-color: #C6C6C8;
             --tab-bar-bg: #F9F9F9;
@@ -61,6 +61,26 @@
         }
         .list-item:last-child { border-bottom: none; }
 
+        /* ИНПУТ ДЛЯ ГОРОДА */
+        .ios-input {
+            border: none;
+            background: transparent;
+            font-size: 17px;
+            color: var(--text-color);
+            width: 100%;
+            outline: none;
+        }
+        .search-btn {
+            background: var(--accent-color);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 6px 12px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
         /* --- ГЛАВНЫЙ ЭКРАН --- */
         .hero-card {
             background: linear-gradient(135deg, #007AFF, #5AC8FA);
@@ -90,7 +110,7 @@
         .tasbih-circle:active { transform: scale(0.95); background: var(--bg-color); }
         .count-text { font-size: 80px; font-weight: 700; font-variant-numeric: tabular-nums; }
 
-        /* --- ПЕРЕКЛЮЧАТЕЛЬ (iOS Switch) --- */
+        /* --- ПЕРЕКЛЮЧАТЕЛЬ --- */
         .switch { position: relative; display: inline-block; width: 51px; height: 31px; }
         .switch input { opacity: 0; width: 0; height: 0; }
         .slider {
@@ -122,28 +142,23 @@
         }
         .tab-btn.active { color: var(--accent-color); }
         .tab-icon { font-size: 24px; margin-bottom: 3px; }
-
-        /* КНОПКИ */
         .btn-text { color: var(--accent-color); font-size: 17px; background: none; border: none; cursor: pointer; }
         .btn-danger { color: var(--danger-color); }
-        
     </style>
 </head>
 <body>
 
     <div id="tab-home" class="container active">
         <h1>Обзор</h1>
-        
         <div class="hero-card">
             <div class="hero-label">Следующий намаз</div>
             <div class="hero-time" id="nextTime">--:--</div>
             <div class="hero-label" id="nextName">Загрузка...</div>
-            <div class="hero-location" id="locationBadge">📍 Поиск GPS...</div>
+            <div class="hero-location" id="locationBadge">📍 Поиск...</div>
         </div>
 
-        <h2>РАСПИСАНИЕ НА СЕГОДНЯ</h2>
-        <div class="card" id="scheduleList">
-            </div>
+        <h2>РАСПИСАНИЕ</h2>
+        <div class="card" id="scheduleList"></div>
     </div>
 
     <div id="tab-tasbih" class="container">
@@ -181,24 +196,27 @@
         <h2>ЛОКАЦИЯ</h2>
         <div class="card">
             <div class="list-item">
-                <span>Город</span>
-                <span style="color: var(--secondary-text)" id="currentCityName">Авто</span>
+                <input type="text" id="cityInput" class="ios-input" placeholder="Введите город (напр. Baku)">
+                <button class="search-btn" onclick="searchCity()">Найти</button>
             </div>
             <div class="list-item" onclick="getLocation()" style="cursor: pointer;">
-                <span style="color: var(--accent-color)">🔄 Обновить GPS</span>
+                <span style="color: var(--accent-color); display:flex; align-items:center;">
+                    <span style="font-size:20px; margin-right:8px;">📍</span> 
+                    Использовать мое местоположение (GPS)
+                </span>
+            </div>
+            <div class="list-item">
+                <span style="color: var(--secondary-text); font-size:14px;">Текущий город:</span>
+                <span id="currentCityName" style="font-weight:600;">Не выбран</span>
             </div>
         </div>
 
         <h2>ТЕСТ</h2>
         <div class="card">
             <div class="list-item" onclick="sendTest()" style="cursor: pointer;">
-                <span style="color: var(--accent-color)">🔔 Отправить тестовое уведомление</span>
+                <span style="color: var(--accent-color)">🔔 Отправить тест</span>
             </div>
         </div>
-        
-        <p style="text-align:center; color: var(--secondary-text); font-size: 13px; margin-top: 20px;">
-            Включите "Уведомления", чтобы бот запомнил ваш город и присылал время намаза автоматически.
-        </p>
     </div>
 
     <div class="tab-bar">
@@ -220,102 +238,103 @@
         let tasbih = parseInt(localStorage.getItem('tasbih')) || 0;
         let isDark = localStorage.getItem('theme') === 'dark';
         let notifEnabled = localStorage.getItem('notifEnabled') === 'true';
-        let currentLat = 0, currentLon = 0;
+        
+        // Глобальные переменные для координат
+        let currentLat = 0;
+        let currentLon = 0;
 
         function init() {
-            // Инициализация темы
             if(isDark) document.body.setAttribute('data-theme', 'dark');
             document.getElementById('themeToggle').checked = isDark;
-
-            // Инициализация уведомлений
             document.getElementById('notifToggle').checked = notifEnabled;
-            
-            // Тасбих
             document.getElementById('tasbihCount').innerText = tasbih;
 
-            // Локация
-            getLocation();
-        }
-
-        // --- ЛОГИКА ТЕМЫ ---
-        function toggleTheme() {
-            isDark = !isDark;
-            document.body.setAttribute('data-theme', isDark ? 'dark' : 'light');
-            localStorage.setItem('theme', isDark ? 'dark' : 'light');
-            if(tg.HapticFeedback) tg.HapticFeedback.selectionChanged();
-        }
-
-        // --- ЛОГИКА УВЕДОМЛЕНИЙ (САМОЕ ВАЖНОЕ) ---
-        function toggleNotifications() {
-            notifEnabled = document.getElementById('notifToggle').checked;
-            localStorage.setItem('notifEnabled', notifEnabled);
-            
-            if (notifEnabled) {
-                // Если включили - отправляем данные боту
-                syncLocationToBot();
+            // Проверяем, есть ли сохраненный город или координаты
+            const savedCity = localStorage.getItem('savedCity');
+            if (savedCity) {
+                document.getElementById('cityInput').value = savedCity;
+                searchCity(savedCity);
             } else {
-                // Если выключили - можно отправить команду на отключение (пока просто локально)
-                alert("Уведомления выключены.");
+                getLocation(); // Если ничего нет, пробуем GPS
             }
-            if(tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
         }
 
-        function syncLocationToBot() {
-            if (currentLat === 0) {
-                alert("Сначала подождите определения GPS!");
-                document.getElementById('notifToggle').checked = false;
-                return;
-            }
-            
-            const offset = new Date().getTimezoneOffset();
-            tg.sendData(JSON.stringify({ 
-                action: 'sync_location', 
-                lat: currentLat, 
-                lon: currentLon, 
-                offset: offset 
-            }));
-            tg.close();
-        }
-
-        // --- ЛОКАЦИЯ ---
+        // --- ЛОГИКА ГОРОДОВ И GPS ---
+        
+        // 1. Поиск по GPS
         function getLocation() {
-            document.getElementById('locationBadge').innerText = "⏳ Обновление...";
-            document.getElementById('currentCityName').innerText = "Поиск...";
+            document.getElementById('locationBadge').innerText = "⏳ GPS...";
+            document.getElementById('currentCityName').innerText = "Поиск GPS...";
             
             navigator.geolocation.getCurrentPosition(
                 pos => {
                     currentLat = pos.coords.latitude;
                     currentLon = pos.coords.longitude;
-                    loadTimings(currentLat, currentLon);
+                    // Очищаем сохраненный город, так как используем GPS
+                    localStorage.removeItem('savedCity');
+                    document.getElementById('cityInput').value = ""; 
+                    
+                    loadTimingsByCoords(currentLat, currentLon);
                 },
                 err => {
-                    // Баку по умолчанию
-                    currentLat = 40.4093; currentLon = 49.8671;
-                    loadTimings(currentLat, currentLon);
+                    alert("GPS не работает. Введите город вручную.");
+                    document.getElementById('locationBadge').innerText = "❌ Нет GPS";
                 }
             );
         }
 
-        function loadTimings(lat, lon) {
+        // 2. Поиск по названию города
+        function searchCity(cityOverride) {
+            let city = cityOverride || document.getElementById('cityInput').value;
+            if(!city) return alert("Введите название города");
+
+            document.getElementById('locationBadge').innerText = "⏳ Поиск...";
+            document.getElementById('currentCityName').innerText = "Загрузка...";
+
+            // Используем API для поиска координат города
+            const url = `https://api.aladhan.com/v1/timingsByCity?city=${city}&country=&method=3`;
+            
+            fetch(url)
+                .then(res => res.json())
+                .then(data => {
+                    if(data.code === 200) {
+                        // СОХРАНЯЕМ КООРДИНАТЫ ГОРОДА!
+                        // Это важно, чтобы бот знал точные координаты
+                        currentLat = data.data.meta.latitude;
+                        currentLon = data.data.meta.longitude;
+                        
+                        localStorage.setItem('savedCity', city); // Запоминаем выбор
+                        
+                        renderTimings(data.data.timings);
+                        
+                        document.getElementById('currentCityName').innerText = city;
+                        document.getElementById('locationBadge').innerText = "📍 " + city;
+                        
+                        // Если уведомления включены - обновляем локацию у бота
+                        if(notifEnabled) syncLocationToBot();
+                    } else {
+                        alert("Город не найден!");
+                    }
+                })
+                .catch(e => alert("Ошибка соединения"));
+        }
+
+        function loadTimingsByCoords(lat, lon) {
             const date = Math.floor(Date.now() / 1000);
             fetch(`https://api.aladhan.com/v1/timings/${date}?latitude=${lat}&longitude=${lon}&method=3`)
                 .then(res => res.json())
                 .then(data => {
                     renderTimings(data.data.timings);
-                    document.getElementById('currentCityName').innerText = "GPS (OK)";
-                    
-                    // Если уведомления уже были включены - тихо обновляем их
-                    if(notifEnabled) {
-                        // Можно добавить логику тихого обновления, но пока оставим ручное включение
-                    }
+                    document.getElementById('currentCityName').innerText = "GPS Координаты";
+                    document.getElementById('locationBadge').innerText = "📍 Моя локация";
+                    if(notifEnabled) syncLocationToBot();
                 });
         }
 
+        // --- ОТРИСОВКА ---
         function renderTimings(timings) {
-            document.getElementById('locationBadge').innerText = "📍 GPS Активен";
             const list = document.getElementById('scheduleList');
             list.innerHTML = "";
-            
             const names = {Fajr:"Фаджр", Sunrise:"Восход", Dhuhr:"Зухр", Asr:"Аср", Maghrib:"Магриб", Isha:"Иша"};
             const now = new Date();
             const nowMins = now.getHours() * 60 + now.getMinutes();
@@ -329,7 +348,6 @@
                         <span style="font-weight:600; color:var(--accent-color); font-size:17px;">${time}</span>
                     </div>
                 `;
-                
                 const [h, m] = time.split(':').map(Number);
                 if (!nextFound && (h*60+m) > nowMins) {
                     document.getElementById('nextTime').innerText = time;
@@ -343,7 +361,42 @@
             }
         }
 
-        // --- ТАСБИХ И МЕНЮ ---
+        // --- УВЕДОМЛЕНИЯ ---
+        function toggleNotifications() {
+            notifEnabled = document.getElementById('notifToggle').checked;
+            localStorage.setItem('notifEnabled', notifEnabled);
+            
+            if (notifEnabled) {
+                syncLocationToBot();
+            } else {
+                alert("Уведомления отключены (локально).");
+            }
+            if(tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
+        }
+
+        function syncLocationToBot() {
+            if (currentLat === 0) {
+                alert("Сначала выберите город или нажмите GPS!");
+                document.getElementById('notifToggle').checked = false;
+                return;
+            }
+            const offset = new Date().getTimezoneOffset();
+            tg.sendData(JSON.stringify({ 
+                action: 'sync_location', 
+                lat: currentLat, 
+                lon: currentLon, 
+                offset: offset 
+            }));
+            // tg.close(); // Можно закрывать, а можно нет
+        }
+
+        // --- ОСТАЛЬНОЕ ---
+        function toggleTheme() {
+            isDark = !isDark;
+            document.body.setAttribute('data-theme', isDark ? 'dark' : 'light');
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+            if(tg.HapticFeedback) tg.HapticFeedback.selectionChanged();
+        }
         function countTasbih() {
             tasbih++; document.getElementById('tasbihCount').innerText = tasbih;
             localStorage.setItem('tasbih', tasbih);
@@ -351,7 +404,6 @@
         }
         function resetTasbih() { tasbih=0; document.getElementById('tasbihCount').innerText=0; localStorage.setItem('tasbih',0); }
         function sendTest() { tg.sendData(JSON.stringify({ action: 'test_notification' })); }
-        
         function switchTab(name, btn) {
             document.querySelectorAll('.container').forEach(el => el.classList.remove('active'));
             document.getElementById('tab-'+name).classList.add('active');

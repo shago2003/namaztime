@@ -45,7 +45,7 @@
         h1 { font-size: 34px; font-weight: 700; margin: 10px 0 20px 0; letter-spacing: -0.5px; }
         h2 { font-size: 13px; text-transform: uppercase; color: var(--secondary-text); margin: 20px 0 8px 15px; }
 
-        /* --- КАРТОЧКИ (iOS Style) --- */
+        /* --- КАРТОЧКИ --- */
         .card {
             background: var(--card-bg);
             border-radius: 12px;
@@ -61,34 +61,20 @@
         }
         .list-item:last-child { border-bottom: none; }
 
-        /* ИНПУТ ДЛЯ ГОРОДА */
         .ios-input {
-            border: none;
-            background: transparent;
-            font-size: 17px;
-            color: var(--text-color);
-            width: 100%;
-            outline: none;
+            border: none; background: transparent; font-size: 17px;
+            color: var(--text-color); width: 100%; outline: none;
         }
         .search-btn {
-            background: var(--accent-color);
-            color: white;
-            border: none;
-            border-radius: 6px;
-            padding: 6px 12px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
+            background: var(--accent-color); color: white; border: none;
+            border-radius: 6px; padding: 6px 12px; font-size: 14px; font-weight: 600; cursor: pointer;
         }
 
         /* --- ГЛАВНЫЙ ЭКРАН --- */
         .hero-card {
             background: linear-gradient(135deg, #007AFF, #5AC8FA);
-            color: white;
-            padding: 30px 20px;
-            border-radius: 20px;
-            text-align: center;
-            box-shadow: 0 10px 20px rgba(0,122,255, 0.3);
+            color: white; padding: 30px 20px; border-radius: 20px;
+            text-align: center; box-shadow: 0 10px 20px rgba(0,122,255, 0.3);
             margin-bottom: 25px;
         }
         .hero-time { font-size: 60px; font-weight: 700; letter-spacing: -2px; line-height: 1; margin: 10px 0; }
@@ -97,15 +83,11 @@
 
         /* --- ТАСБИХ --- */
         .tasbih-circle {
-            width: 250px; height: 250px;
-            border-radius: 50%;
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
+            width: 250px; height: 250px; border-radius: 50%;
+            background: var(--card-bg); border: 1px solid var(--border-color);
             display: flex; align-items: center; justify-content: center; flex-direction: column;
-            margin: 40px auto;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
-            transition: transform 0.1s;
-            cursor: pointer;
+            margin: 40px auto; box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            transition: transform 0.1s; cursor: pointer;
         }
         .tasbih-circle:active { transform: scale(0.95); background: var(--bg-color); }
         .count-text { font-size: 80px; font-weight: 700; font-variant-numeric: tabular-nums; }
@@ -136,8 +118,8 @@
             height: 55px; z-index: 1000;
         }
         .tab-btn {
-            background: none; border: none;
-            flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+            background: none; border: none; flex: 1;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
             color: var(--secondary-text); font-size: 10px; font-weight: 500;
         }
         .tab-btn.active { color: var(--accent-color); }
@@ -156,7 +138,6 @@
             <div class="hero-label" id="nextName">Загрузка...</div>
             <div class="hero-location" id="locationBadge">📍 Поиск...</div>
         </div>
-
         <h2>РАСПИСАНИЕ</h2>
         <div class="card" id="scheduleList"></div>
     </div>
@@ -174,7 +155,6 @@
 
     <div id="tab-settings" class="container">
         <h1>Настройки</h1>
-
         <h2>ОСНОВНЫЕ</h2>
         <div class="card">
             <div class="list-item">
@@ -197,12 +177,12 @@
         <div class="card">
             <div class="list-item">
                 <input type="text" id="cityInput" class="ios-input" placeholder="Введите город (напр. Baku)">
-                <button class="search-btn" onclick="searchCity()">Найти</button>
+                <button class="search-btn" onclick="searchCity(null, true)">Найти</button>
             </div>
-            <div class="list-item" onclick="getLocation()" style="cursor: pointer;">
+            <div class="list-item" onclick="getLocation(true)" style="cursor: pointer;">
                 <span style="color: var(--accent-color); display:flex; align-items:center;">
                     <span style="font-size:20px; margin-right:8px;">📍</span> 
-                    Использовать мое местоположение (GPS)
+                    Обновить GPS и Отправить Боту
                 </span>
             </div>
             <div class="list-item">
@@ -214,7 +194,7 @@
         <h2>ТЕСТ</h2>
         <div class="card">
             <div class="list-item" onclick="sendTest()" style="cursor: pointer;">
-                <span style="color: var(--accent-color)">🔔 Отправить тест</span>
+                <span style="color: var(--accent-color)">🔔 Тест уведомления</span>
             </div>
         </div>
     </div>
@@ -238,10 +218,7 @@
         let tasbih = parseInt(localStorage.getItem('tasbih')) || 0;
         let isDark = localStorage.getItem('theme') === 'dark';
         let notifEnabled = localStorage.getItem('notifEnabled') === 'true';
-        
-        // Глобальные переменные для координат
-        let currentLat = 0;
-        let currentLon = 0;
+        let currentLat = 0, currentLon = 0;
 
         function init() {
             if(isDark) document.body.setAttribute('data-theme', 'dark');
@@ -249,77 +226,73 @@
             document.getElementById('notifToggle').checked = notifEnabled;
             document.getElementById('tasbihCount').innerText = tasbih;
 
-            // Проверяем, есть ли сохраненный город или координаты
             const savedCity = localStorage.getItem('savedCity');
             if (savedCity) {
                 document.getElementById('cityInput').value = savedCity;
-                searchCity(savedCity);
+                // Загружаем ТИХО (false), не беспокоя бота
+                searchCity(savedCity, false);
             } else {
-                getLocation(); // Если ничего нет, пробуем GPS
+                // Загружаем ТИХО (false)
+                getLocation(false);
             }
         }
 
-        // --- ЛОГИКА ГОРОДОВ И GPS ---
+        // --- ЛОГИКА ---
         
-        // 1. Поиск по GPS
-        function getLocation() {
-            document.getElementById('locationBadge').innerText = "⏳ GPS...";
-            document.getElementById('currentCityName').innerText = "Поиск GPS...";
+        // Получить GPS
+        // isManual = true (если нажал кнопку), false (если при запуске приложения)
+        function getLocation(isManual = false) {
+            if(isManual) {
+                document.getElementById('locationBadge').innerText = "⏳ GPS...";
+                document.getElementById('currentCityName').innerText = "Поиск GPS...";
+            }
             
             navigator.geolocation.getCurrentPosition(
                 pos => {
                     currentLat = pos.coords.latitude;
                     currentLon = pos.coords.longitude;
-                    // Очищаем сохраненный город, так как используем GPS
                     localStorage.removeItem('savedCity');
                     document.getElementById('cityInput').value = ""; 
                     
-                    loadTimingsByCoords(currentLat, currentLon);
+                    loadTimingsByCoords(currentLat, currentLon, isManual);
                 },
                 err => {
-                    alert("GPS не работает. Введите город вручную.");
-                    document.getElementById('locationBadge').innerText = "❌ Нет GPS";
+                    if(isManual) alert("GPS недоступен.");
+                    // По умолчанию Баку (тихо)
+                    loadTimingsByCoords(40.4093, 49.8671, false);
                 }
             );
         }
 
-        // 2. Поиск по названию города
-        function searchCity(cityOverride) {
+        function searchCity(cityOverride, isManual = false) {
             let city = cityOverride || document.getElementById('cityInput').value;
-            if(!city) return alert("Введите название города");
+            if(!city) return;
 
-            document.getElementById('locationBadge').innerText = "⏳ Поиск...";
-            document.getElementById('currentCityName').innerText = "Загрузка...";
+            if(isManual) document.getElementById('locationBadge').innerText = "⏳...";
 
-            // Используем API для поиска координат города
-            const url = `https://api.aladhan.com/v1/timingsByCity?city=${city}&country=&method=3`;
-            
-            fetch(url)
+            fetch(`https://api.aladhan.com/v1/timingsByCity?city=${city}&country=&method=3`)
                 .then(res => res.json())
                 .then(data => {
                     if(data.code === 200) {
-                        // СОХРАНЯЕМ КООРДИНАТЫ ГОРОДА!
-                        // Это важно, чтобы бот знал точные координаты
                         currentLat = data.data.meta.latitude;
                         currentLon = data.data.meta.longitude;
-                        
-                        localStorage.setItem('savedCity', city); // Запоминаем выбор
+                        localStorage.setItem('savedCity', city);
                         
                         renderTimings(data.data.timings);
                         
                         document.getElementById('currentCityName').innerText = city;
                         document.getElementById('locationBadge').innerText = "📍 " + city;
                         
-                        // Если уведомления включены - обновляем локацию у бота
-                        if(notifEnabled) syncLocationToBot();
-                    } else {
+                        // ОТПРАВЛЯЕМ БОТУ ТОЛЬКО ЕСЛИ ЭТО РУЧНОЕ ДЕЙСТВИЕ
+                        if(isManual && notifEnabled) syncLocationToBot();
+                    } else if(isManual) {
                         alert("Город не найден!");
                     }
                 })
-                .catch(e => alert("Ошибка соединения"));
+                .catch(e => console.log(e));
         }
 
-        function loadTimingsByCoords(lat, lon) {
+        function loadTimingsByCoords(lat, lon, isManual) {
             const date = Math.floor(Date.now() / 1000);
             fetch(`https://api.aladhan.com/v1/timings/${date}?latitude=${lat}&longitude=${lon}&method=3`)
                 .then(res => res.json())
@@ -327,11 +300,39 @@
                     renderTimings(data.data.timings);
                     document.getElementById('currentCityName').innerText = "GPS Координаты";
                     document.getElementById('locationBadge').innerText = "📍 Моя локация";
-                    if(notifEnabled) syncLocationToBot();
+                    
+                    // ОТПРАВЛЯЕМ БОТУ ТОЛЬКО ЕСЛИ ЭТО РУЧНОЕ ДЕЙСТВИЕ
+                    if(isManual && notifEnabled) syncLocationToBot();
                 });
         }
 
-        // --- ОТРИСОВКА ---
+        function syncLocationToBot() {
+            if (currentLat === 0) return alert("Сначала определите город!");
+            
+            const offset = new Date().getTimezoneOffset();
+            tg.sendData(JSON.stringify({ 
+                action: 'sync_location', 
+                lat: currentLat, 
+                lon: currentLon, 
+                offset: offset 
+            }));
+            // tg.close();
+        }
+
+        function toggleNotifications() {
+            notifEnabled = document.getElementById('notifToggle').checked;
+            localStorage.setItem('notifEnabled', notifEnabled);
+            
+            if (notifEnabled) {
+                // Если ВКЛЮЧИЛИ переключатель - отправляем данные
+                syncLocationToBot();
+            } else {
+                alert("Авто-уведомления выключены.");
+            }
+            if(tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
+        }
+
+        // --- ВИЗУАЛ ---
         function renderTimings(timings) {
             const list = document.getElementById('scheduleList');
             list.innerHTML = "";
@@ -361,36 +362,6 @@
             }
         }
 
-        // --- УВЕДОМЛЕНИЯ ---
-        function toggleNotifications() {
-            notifEnabled = document.getElementById('notifToggle').checked;
-            localStorage.setItem('notifEnabled', notifEnabled);
-            
-            if (notifEnabled) {
-                syncLocationToBot();
-            } else {
-                alert("Уведомления отключены (локально).");
-            }
-            if(tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
-        }
-
-        function syncLocationToBot() {
-            if (currentLat === 0) {
-                alert("Сначала выберите город или нажмите GPS!");
-                document.getElementById('notifToggle').checked = false;
-                return;
-            }
-            const offset = new Date().getTimezoneOffset();
-            tg.sendData(JSON.stringify({ 
-                action: 'sync_location', 
-                lat: currentLat, 
-                lon: currentLon, 
-                offset: offset 
-            }));
-            // tg.close(); // Можно закрывать, а можно нет
-        }
-
-        // --- ОСТАЛЬНОЕ ---
         function toggleTheme() {
             isDark = !isDark;
             document.body.setAttribute('data-theme', isDark ? 'dark' : 'light');

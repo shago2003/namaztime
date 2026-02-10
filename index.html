@@ -12,7 +12,6 @@
             --text-color: #000000;
             --secondary-text: #8E8E93;
             --accent-color: #007AFF;
-            --danger-color: #FF3B30;
             --success-color: #34C759;
             --tab-bar-bg: #FFFFFF;
             --border-color: #E5E5EA;
@@ -36,6 +35,7 @@
             overflow-x: hidden; -webkit-tap-highlight-color: transparent;
         }
 
+        /* АНИМАЦИЯ */
         .container { display: none; padding: 20px; animation: fadeIn 0.3s ease; }
         .container.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
@@ -48,12 +48,21 @@
         h1 { font-size: 28px; font-weight: 700; margin: 10px 0 20px 0; }
         h2 { font-size: 18px; font-weight: 600; margin-bottom: 10px; margin-top: 5px; color: var(--secondary-text); text-transform: uppercase; letter-spacing: 0.5px; }
 
-        /* HERO & LISTS */
+        /* HERO СЕКЦИЯ (СОЛНЦЕ/ЛУНА) */
         .hero-card {
             text-align: center; color: white; padding: 40px 20px;
-            background: linear-gradient(135deg, #007AFF, #5AC8FA);
+            background: linear-gradient(135deg, #007AFF, #5AC8FA); /* Default */
+            transition: background 1s ease;
         }
+        .hero-icon { font-size: 60px; margin-bottom: 10px; display: block; }
+        .hero-label { font-size: 16px; opacity: 0.9; text-transform: uppercase; letter-spacing: 1px; }
         .hero-time { font-size: 48px; font-weight: 800; margin: 10px 0; }
+        .location-badge { 
+            display: inline-block; background: rgba(255,255,255,0.2); 
+            padding: 4px 12px; border-radius: 20px; font-size: 13px; backdrop-filter: blur(5px);
+        }
+
+        /* СПИСОК НАМАЗОВ */
         .prayer-row {
             display: flex; justify-content: space-between; padding: 16px 0;
             border-bottom: 1px solid var(--border-color); font-size: 17px;
@@ -61,29 +70,38 @@
         .prayer-row:last-child { border-bottom: none; }
         .prayer-time { font-weight: 600; color: var(--accent-color); }
 
-        /* INPUTS & BUTTONS */
+        /* ТАСБИХ */
+        .tasbih-container { text-align: center; padding-top: 40px; }
+        .counter-display { font-size: 80px; font-weight: 700; font-variant-numeric: tabular-nums; margin: 20px 0; }
+        .tasbih-btn {
+            width: 200px; height: 200px; border-radius: 50%;
+            background: var(--accent-color); border: none; color: white;
+            font-size: 24px; box-shadow: 0 10px 30px rgba(0,122,255,0.3);
+            cursor: pointer; transition: transform 0.1s;
+        }
+        .tasbih-btn:active { transform: scale(0.95); }
+        .reset-btn { margin-top: 30px; background: none; border: none; color: var(--secondary-text); font-size: 16px; padding: 10px; }
+
+
+        /* НАСТРОЙКИ */
         .setting-item {
             display: flex; justify-content: space-between; align-items: center;
             padding: 16px 0; border-bottom: 1px solid var(--border-color);
         }
-        .setting-item:last-child { border-bottom: none; }
-        
         .btn-full {
             background: var(--accent-color); color: white; border: none;
             padding: 14px; border-radius: 12px; font-size: 16px; font-weight: 600;
             width: 100%; cursor: pointer; margin-top: 10px;
         }
-        .btn-full:disabled {
-            background-color: var(--secondary-text); opacity: 0.5; cursor: not-allowed;
-        }
+        .btn-full:disabled { background-color: var(--secondary-text); opacity: 0.5; }
         .btn-test { background-color: var(--success-color); }
-        .input-time {
+        .input-time, .input-city {
             background: var(--bg-color); border: 1px solid var(--border-color);
             color: var(--text-color); padding: 12px; border-radius: 8px; 
             font-size: 16px; width: 100%; box-sizing: border-box; display: block;
         }
 
-        /* TOGGLE SWITCH */
+        /* ПЕРЕКЛЮЧАТЕЛЬ (Switch) */
         .switch { position: relative; display: inline-block; width: 50px; height: 30px; }
         .switch input { opacity: 0; width: 0; height: 0; }
         .slider {
@@ -97,11 +115,11 @@
         input:checked + .slider { background-color: var(--success-color); }
         input:checked + .slider:before { transform: translateX(20px); }
 
-        /* TAB BAR */
+        /* МЕНЮ (TAB BAR) */
         .tab-bar {
             position: fixed; bottom: 0; left: 0; width: 100%;
             background: var(--tab-bar-bg); border-top: 1px solid var(--border-color);
-            display: flex; justify-content: space-around; height: 60px; padding-bottom: env(safe-area-inset-bottom);
+            display: flex; justify-content: space-around; height: 60px; padding-bottom: env(safe-area-inset-bottom); z-index: 100;
         }
         .tab-btn {
             flex: 1; background: none; border: none; color: var(--secondary-text);
@@ -115,18 +133,36 @@
 
     <div id="tab-home" class="container active">
         <h1>Ассаляму алейкум</h1>
+        
         <div class="card hero-card" id="heroCard">
-            <span style="font-size:50px" id="heroIcon">⏳</span>
-            <div>Следующий намаз</div>
+            <span class="hero-icon" id="heroIcon">⏳</span>
+            <div class="hero-label">Следующий намаз</div>
             <div class="hero-time" id="nextPrayerTime">--:--</div>
-            <div id="nextPrayerName">Загрузка...</div>
+            <div class="hero-label" id="nextPrayerName">Загрузка...</div>
+            <br>
+            <div class="location-badge" id="locationBadge">📍 Поиск...</div>
         </div>
-        <div class="card" id="homeScheduleList"></div>
+
+        <div class="card" id="homeScheduleList">Загрузка расписания...</div>
+    </div>
+
+    <div id="tab-schedule" class="container">
+        <h1>Расписание</h1>
+        <div class="card" id="scheduleList"></div>
+    </div>
+
+    <div id="tab-tasbih" class="container">
+        <h1>Тасбих</h1>
+        <div class="tasbih-container">
+            <div class="counter-display" id="tasbihCount">0</div>
+            <button class="tasbih-btn" onclick="incrementTasbih()">СубханАллах</button>
+            <br>
+            <button class="reset-btn" onclick="resetTasbih()">Сбросить</button>
+        </div>
     </div>
 
     <div id="tab-settings" class="container">
         <h1>Настройки</h1>
-
         <div class="card">
             <div class="setting-item">
                 <span>Темная тема</span>
@@ -147,35 +183,30 @@
                 </label>
             </div>
             
-            <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border-color);">
-                <div style="margin-bottom: 10px;">Проверка связи с ботом:</div>
+            <div style="margin-top: 15px; border-top: 1px solid var(--border-color); padding-top: 15px;">
                 <button id="btnTest" class="btn-full btn-test" onclick="sendTest()">🔔 Проверить (Тест)</button>
             </div>
 
-            <div style="margin-top: 20px;">
-                <div style="margin-bottom: 10px;">Напомнить мне в:</div>
+            <div style="margin-top: 15px;">
                 <input type="time" id="alarmTime" class="input-time">
                 <button id="btnAlarm" class="btn-full" onclick="setAlarm()">⏰ Установить</button>
             </div>
-            
-            <p style="font-size: 13px; color: var(--secondary-text); margin-top: 10px;">
-                * При нажатии кнопок приложение закроется, и бот пришлет подтверждение.
-            </p>
         </div>
 
         <h2>Локация</h2>
         <div class="card">
-            <button class="btn-full" onclick="getLocation('gps')">📍 GPS (Авто)</button>
+            <button class="btn-full" onclick="getLocation('gps')">📍 GPS</button>
             <div style="margin-top: 10px; display: flex; gap: 10px;">
-                <input type="text" id="cityInput" class="input-time" placeholder="City (e.g. Baku)">
+                <input type="text" id="cityInput" class="input-city" placeholder="Город (Baku)">
                 <button class="btn-full" style="width: 80px; margin-top:0" onclick="getLocation('city')">OK</button>
             </div>
-            <div id="locationStatus" style="font-size: 13px; color: var(--secondary-text); margin-top: 5px; text-align: center;"></div>
         </div>
     </div>
 
     <div class="tab-bar">
         <button class="tab-btn active" onclick="switchTab('home', this)"><span class="tab-icon">🏠</span>Главная</button>
+        <button class="tab-btn" onclick="switchTab('schedule', this)"><span class="tab-icon">📅</span>Время</button>
+        <button class="tab-btn" onclick="switchTab('tasbih', this)"><span class="tab-icon">📿</span>Тасбих</button>
         <button class="tab-btn" onclick="switchTab('settings', this)"><span class="tab-icon">⚙️</span>Настройки</button>
     </div>
 
@@ -183,70 +214,76 @@
         const tg = window.Telegram.WebApp;
         tg.expand();
 
-        // --- GLOBAL VARIABLES ---
-        let notificationsEnabled = localStorage.getItem('notifEnabled') === 'true';
         let currentTimings = null;
+        let tasbihCount = parseInt(localStorage.getItem('tasbih')) || 0;
+        let notificationsEnabled = localStorage.getItem('notifEnabled') === 'true';
 
-        // --- INIT ---
+        // --- ИНИЦИАЛИЗАЦИЯ ---
         function init() {
-            // Theme
+            document.getElementById('tasbihCount').innerText = tasbihCount;
+            
             if(localStorage.getItem('theme') === 'dark') {
                 document.body.setAttribute('data-theme', 'dark');
                 document.getElementById('themeToggle').checked = true;
             }
-            
-            // Notifications Toggle State
+
             document.getElementById('notifToggle').checked = notificationsEnabled;
             updateButtonsState();
 
-            // Location
-            const city = localStorage.getItem('savedCity');
-            if(city) fetchByCity(city); else getLocation('gps');
+            const savedCity = localStorage.getItem('savedCity');
+            if (savedCity) fetchByCity(savedCity); else getLocation('gps');
         }
 
-        // --- NOTIFICATIONS LOGIC ---
+        // --- ТАСБИХ ---
+        function incrementTasbih() {
+            tasbihCount++;
+            document.getElementById('tasbihCount').innerText = tasbihCount;
+            localStorage.setItem('tasbih', tasbihCount);
+            if(tg.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
+        }
+
+        function resetTasbih() {
+            if(confirm('Сбросить?')) {
+                tasbihCount = 0;
+                document.getElementById('tasbihCount').innerText = 0;
+                localStorage.setItem('tasbih', 0);
+            }
+        }
+
+        // --- УВЕДОМЛЕНИЯ ---
         function toggleNotifications() {
             notificationsEnabled = document.getElementById('notifToggle').checked;
             localStorage.setItem('notifEnabled', notificationsEnabled);
             updateButtonsState();
-            
-            if(notificationsEnabled) {
-                tg.HapticFeedback.notificationOccurred('success');
-            }
         }
 
         function updateButtonsState() {
-            // Если уведомления ВЫКЛ, кнопки становятся серыми (disabled)
-            document.getElementById('btnTest').disabled = !notificationsEnabled;
-            document.getElementById('btnAlarm').disabled = !notificationsEnabled;
-            document.getElementById('alarmTime').disabled = !notificationsEnabled;
+            const disabled = !notificationsEnabled;
+            document.getElementById('btnTest').disabled = disabled;
+            document.getElementById('btnAlarm').disabled = disabled;
+            document.getElementById('alarmTime').disabled = disabled;
         }
 
         function sendTest() {
             if(!notificationsEnabled) return;
-            // Отправляем данные боту
-            const data = JSON.stringify({ action: 'test_notification' });
-            tg.sendData(data);
+            // ВАЖНО: Это сработает только если приложение открыто через Keyboard Button
+            tg.sendData(JSON.stringify({ action: 'test_notification' }));
         }
 
         function setAlarm() {
             if(!notificationsEnabled) return;
-            const timeVal = document.getElementById('alarmTime').value;
-            if(!timeVal) {
-                alert("Выберите время!");
-                return;
-            }
-            const data = JSON.stringify({ action: 'set_alarm', time: timeVal });
-            tg.sendData(data);
+            const time = document.getElementById('alarmTime').value;
+            if(!time) return alert("Выберите время!");
+            tg.sendData(JSON.stringify({ action: 'set_alarm', time: time }));
         }
 
-        // --- LOCATION & API ---
+        // --- API & RENDER ---
         function getLocation(type) {
-            document.getElementById('locationStatus').innerText = "Поиск...";
+            document.getElementById('locationBadge').innerText = "⏳ Обновление...";
             if (type === 'gps') {
                 navigator.geolocation.getCurrentPosition(
                     pos => fetchByCoords(pos.coords.latitude, pos.coords.longitude),
-                    err => alert("GPS недоступен")
+                    err => alert("GPS не доступен")
                 );
             } else {
                 const city = document.getElementById('cityInput').value;
@@ -257,51 +294,73 @@
         async function fetchByCoords(lat, lon) {
             const date = Math.floor(Date.now() / 1000);
             const url = `https://api.aladhan.com/v1/timings/${date}?latitude=${lat}&longitude=${lon}&method=3`;
-            loadData(url);
+            loadData(url, "GPS");
         }
 
         async function fetchByCity(city) {
             const url = `https://api.aladhan.com/v1/timingsByCity?city=${city}&country=Azerbaijan&method=3`;
-            loadData(url);
+            loadData(url, city);
         }
 
-        async function loadData(url) {
+        async function loadData(url, locName) {
             try {
                 const res = await fetch(url);
                 const data = await res.json();
                 currentTimings = data.data.timings || data.data.data.timings;
-                document.getElementById('locationStatus').innerText = "Обновлено";
-                renderHome();
-            } catch(e) {
-                document.getElementById('locationStatus').innerText = "Ошибка";
-            }
+                document.getElementById('locationBadge').innerText = "📍 " + locName;
+                renderAll();
+            } catch(e) { console.error(e); }
         }
 
-        function renderHome() {
-            const list = document.getElementById('homeScheduleList');
-            list.innerHTML = "";
+        function renderAll() {
             const ruNames = {Fajr:"Фаджр", Sunrise:"Восход", Dhuhr:"Зухр", Asr:"Аср", Maghrib:"Магриб", Isha:"Иша"};
-            
-            // Найти следующий намаз
+            const list = document.getElementById('scheduleList');
+            const homeList = document.getElementById('homeScheduleList');
+            list.innerHTML = ""; homeList.innerHTML = "";
+
             const now = new Date();
             const nowMins = now.getHours() * 60 + now.getMinutes();
             let nextName = "Fajr", nextTime = currentTimings["Fajr"];
-            
+            let found = false;
+
             ['Fajr','Sunrise','Dhuhr','Asr','Maghrib','Isha'].forEach(key => {
                 const time = currentTimings[key];
-                list.innerHTML += `<div class="prayer-row"><span>${ruNames[key]}</span><span class="prayer-time">${time}</span></div>`;
-                
+                const row = `<div class="prayer-row"><span>${ruNames[key]}</span><span class="prayer-time">${time}</span></div>`;
+                list.innerHTML += row;
+                homeList.innerHTML += row;
+
                 const [h, m] = time.split(':').map(Number);
-                if ((h*60+m) > nowMins && nextName === "Fajr") {
-                    nextName = key; nextTime = time;
+                if (!found && (h*60+m) > nowMins) {
+                    nextName = key; nextTime = time; found = true;
                 }
             });
-            
+
+            // Обновляем HERO
             document.getElementById('nextPrayerName').innerText = ruNames[nextName];
             document.getElementById('nextPrayerTime').innerText = nextTime;
+            updateHeroVisuals(nextName);
         }
 
-        // --- TABS ---
+        function updateHeroVisuals(prayer) {
+            const card = document.getElementById('heroCard');
+            const icon = document.getElementById('heroIcon');
+            
+            if (prayer === 'Fajr' || prayer === 'Sunrise') {
+                card.style.background = "linear-gradient(135deg, #2c3e50, #4ca1af)"; // Ночь
+                icon.innerText = "🌙";
+            } else if (prayer === 'Dhuhr' || prayer === 'Asr') {
+                card.style.background = "linear-gradient(135deg, #56CCF2, #2F80ED)"; // День
+                icon.innerText = "☀️";
+            } else if (prayer === 'Maghrib') {
+                card.style.background = "linear-gradient(135deg, #f12711, #f5af19)"; // Закат
+                icon.innerText = "🌅";
+            } else {
+                card.style.background = "linear-gradient(135deg, #141E30, #243B55)"; // Иша
+                icon.innerText = "🌌";
+            }
+        }
+
+        // --- TABS & THEME ---
         function switchTab(tab, btn) {
             document.querySelectorAll('.container').forEach(e => e.classList.remove('active'));
             document.getElementById('tab-'+tab).classList.add('active');

@@ -35,7 +35,7 @@
             overflow-x: hidden; -webkit-tap-highlight-color: transparent;
         }
 
-        /* АНИМАЦИЯ */
+        /* --- КОНТЕЙНЕРЫ (ВКЛАДКИ) --- */
         .container { display: none; padding: 20px; animation: fadeIn 0.3s ease; }
         .container.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
@@ -48,21 +48,21 @@
         h1 { font-size: 28px; font-weight: 700; margin: 10px 0 20px 0; }
         h2 { font-size: 18px; font-weight: 600; margin-bottom: 10px; margin-top: 5px; color: var(--secondary-text); text-transform: uppercase; letter-spacing: 0.5px; }
 
-        /* HERO СЕКЦИЯ (СОЛНЦЕ/ЛУНА) */
+        /* --- ГЛАВНЫЙ ЭКРАН (HERO) --- */
         .hero-card {
             text-align: center; color: white; padding: 40px 20px;
-            background: linear-gradient(135deg, #007AFF, #5AC8FA); /* Default */
+            background: linear-gradient(135deg, #007AFF, #5AC8FA); /* По умолчанию */
             transition: background 1s ease;
         }
-        .hero-icon { font-size: 60px; margin-bottom: 10px; display: block; }
+        .hero-icon { font-size: 80px; margin-bottom: 15px; display: block; text-shadow: 0 4px 10px rgba(0,0,0,0.2); }
         .hero-label { font-size: 16px; opacity: 0.9; text-transform: uppercase; letter-spacing: 1px; }
-        .hero-time { font-size: 48px; font-weight: 800; margin: 10px 0; }
+        .hero-time { font-size: 56px; font-weight: 800; margin: 5px 0; }
         .location-badge { 
             display: inline-block; background: rgba(255,255,255,0.2); 
             padding: 4px 12px; border-radius: 20px; font-size: 13px; backdrop-filter: blur(5px);
         }
 
-        /* СПИСОК НАМАЗОВ */
+        /* --- СПИСОК ВРЕМЕНИ --- */
         .prayer-row {
             display: flex; justify-content: space-between; padding: 16px 0;
             border-bottom: 1px solid var(--border-color); font-size: 17px;
@@ -70,20 +70,19 @@
         .prayer-row:last-child { border-bottom: none; }
         .prayer-time { font-weight: 600; color: var(--accent-color); }
 
-        /* ТАСБИХ */
+        /* --- ТАСБИХ (СТИЛИ) --- */
         .tasbih-container { text-align: center; padding-top: 40px; }
-        .counter-display { font-size: 80px; font-weight: 700; font-variant-numeric: tabular-nums; margin: 20px 0; }
+        .counter-display { font-size: 90px; font-weight: 700; font-variant-numeric: tabular-nums; margin: 20px 0; }
         .tasbih-btn {
-            width: 200px; height: 200px; border-radius: 50%;
+            width: 220px; height: 220px; border-radius: 50%;
             background: var(--accent-color); border: none; color: white;
-            font-size: 24px; box-shadow: 0 10px 30px rgba(0,122,255,0.3);
-            cursor: pointer; transition: transform 0.1s;
+            font-size: 28px; box-shadow: 0 10px 30px rgba(0,122,255,0.4);
+            cursor: pointer; transition: transform 0.1s; display: flex; align-items: center; justify-content: center; margin: 0 auto;
         }
         .tasbih-btn:active { transform: scale(0.95); }
-        .reset-btn { margin-top: 30px; background: none; border: none; color: var(--secondary-text); font-size: 16px; padding: 10px; }
+        .reset-btn { margin-top: 30px; background: none; border: none; color: var(--secondary-text); font-size: 16px; padding: 10px; cursor: pointer;}
 
-
-        /* НАСТРОЙКИ */
+        /* --- НАСТРОЙКИ (СТИЛИ) --- */
         .setting-item {
             display: flex; justify-content: space-between; align-items: center;
             padding: 16px 0; border-bottom: 1px solid var(--border-color);
@@ -101,7 +100,7 @@
             font-size: 16px; width: 100%; box-sizing: border-box; display: block;
         }
 
-        /* ПЕРЕКЛЮЧАТЕЛЬ (Switch) */
+        /* ПЕРЕКЛЮЧАТЕЛЬ */
         .switch { position: relative; display: inline-block; width: 50px; height: 30px; }
         .switch input { opacity: 0; width: 0; height: 0; }
         .slider {
@@ -115,7 +114,7 @@
         input:checked + .slider { background-color: var(--success-color); }
         input:checked + .slider:before { transform: translateX(20px); }
 
-        /* МЕНЮ (TAB BAR) */
+        /* --- НИЖНЕЕ МЕНЮ (TAB BAR) --- */
         .tab-bar {
             position: fixed; bottom: 0; left: 0; width: 100%;
             background: var(--tab-bar-bg); border-top: 1px solid var(--border-color);
@@ -135,7 +134,7 @@
         <h1>Ассаляму алейкум</h1>
         
         <div class="card hero-card" id="heroCard">
-            <span class="hero-icon" id="heroIcon">⏳</span>
+            <span class="hero-icon" id="heroIcon">☀️</span>
             <div class="hero-label">Следующий намаз</div>
             <div class="hero-time" id="nextPrayerTime">--:--</div>
             <div class="hero-label" id="nextPrayerName">Загрузка...</div>
@@ -143,7 +142,10 @@
             <div class="location-badge" id="locationBadge">📍 Поиск...</div>
         </div>
 
-        <div class="card" id="homeScheduleList">Загрузка расписания...</div>
+        <div class="card">
+            <h2 style="margin-top:0">Сегодня</h2>
+            <div id="homeScheduleList"></div>
+        </div>
     </div>
 
     <div id="tab-schedule" class="container">
@@ -155,9 +157,14 @@
         <h1>Тасбих</h1>
         <div class="tasbih-container">
             <div class="counter-display" id="tasbihCount">0</div>
-            <button class="tasbih-btn" onclick="incrementTasbih()">СубханАллах</button>
+            <button class="tasbih-btn" onclick="incrementTasbih()">
+                <div>
+                    <span style="font-size:30px; display:block;">👆</span>
+                    Нажать
+                </div>
+            </button>
             <br>
-            <button class="reset-btn" onclick="resetTasbih()">Сбросить</button>
+            <button class="reset-btn" onclick="resetTasbih()">Сбросить счетчик</button>
         </div>
     </div>
 
@@ -195,19 +202,27 @@
 
         <h2>Локация</h2>
         <div class="card">
-            <button class="btn-full" onclick="getLocation('gps')">📍 GPS</button>
+            <button class="btn-full" onclick="getLocation('gps')">📍 GPS (Авто)</button>
             <div style="margin-top: 10px; display: flex; gap: 10px;">
-                <input type="text" id="cityInput" class="input-city" placeholder="Город (Baku)">
+                <input type="text" id="cityInput" class="input-city" placeholder="Город (напр. Baku)">
                 <button class="btn-full" style="width: 80px; margin-top:0" onclick="getLocation('city')">OK</button>
             </div>
         </div>
     </div>
 
     <div class="tab-bar">
-        <button class="tab-btn active" onclick="switchTab('home', this)"><span class="tab-icon">🏠</span>Главная</button>
-        <button class="tab-btn" onclick="switchTab('schedule', this)"><span class="tab-icon">📅</span>Время</button>
-        <button class="tab-btn" onclick="switchTab('tasbih', this)"><span class="tab-icon">📿</span>Тасбих</button>
-        <button class="tab-btn" onclick="switchTab('settings', this)"><span class="tab-icon">⚙️</span>Настройки</button>
+        <button class="tab-btn active" onclick="switchTab('home', this)">
+            <span class="tab-icon">🏠</span>Главная
+        </button>
+        <button class="tab-btn" onclick="switchTab('schedule', this)">
+            <span class="tab-icon">📅</span>Время
+        </button>
+        <button class="tab-btn" onclick="switchTab('tasbih', this)">
+            <span class="tab-icon">📿</span>Тасбих
+        </button>
+        <button class="tab-btn" onclick="switchTab('settings', this)">
+            <span class="tab-icon">⚙️</span>Настройки
+        </button>
     </div>
 
     <script>
@@ -218,23 +233,31 @@
         let tasbihCount = parseInt(localStorage.getItem('tasbih')) || 0;
         let notificationsEnabled = localStorage.getItem('notifEnabled') === 'true';
 
-        // --- ИНИЦИАЛИЗАЦИЯ ---
+        // --- ЗАПУСК ---
         function init() {
+            // Тасбих
             document.getElementById('tasbihCount').innerText = tasbihCount;
             
+            // Тема
             if(localStorage.getItem('theme') === 'dark') {
                 document.body.setAttribute('data-theme', 'dark');
                 document.getElementById('themeToggle').checked = true;
             }
 
+            // Уведомления
             document.getElementById('notifToggle').checked = notificationsEnabled;
             updateButtonsState();
 
+            // Локация
             const savedCity = localStorage.getItem('savedCity');
-            if (savedCity) fetchByCity(savedCity); else getLocation('gps');
+            if (savedCity) {
+                fetchByCity(savedCity);
+            } else {
+                getLocation('gps');
+            }
         }
 
-        // --- ТАСБИХ ---
+        // --- ЛОГИКА ТАСБИХА ---
         function incrementTasbih() {
             tasbihCount++;
             document.getElementById('tasbihCount').innerText = tasbihCount;
@@ -243,11 +266,20 @@
         }
 
         function resetTasbih() {
-            if(confirm('Сбросить?')) {
+            if(confirm('Точно сбросить?')) {
                 tasbihCount = 0;
                 document.getElementById('tasbihCount').innerText = 0;
                 localStorage.setItem('tasbih', 0);
             }
+        }
+
+        // --- ЛОГИКА ВКЛАДОК ---
+        function switchTab(tabName, btn) {
+            document.querySelectorAll('.container').forEach(el => el.classList.remove('active'));
+            document.getElementById('tab-' + tabName).classList.add('active');
+            
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            btn.classList.add('active');
         }
 
         // --- УВЕДОМЛЕНИЯ ---
@@ -266,7 +298,6 @@
 
         function sendTest() {
             if(!notificationsEnabled) return;
-            // ВАЖНО: Это сработает только если приложение открыто через Keyboard Button
             tg.sendData(JSON.stringify({ action: 'test_notification' }));
         }
 
@@ -277,13 +308,13 @@
             tg.sendData(JSON.stringify({ action: 'set_alarm', time: time }));
         }
 
-        // --- API & RENDER ---
+        // --- API И ВИЗУАЛ ---
         function getLocation(type) {
             document.getElementById('locationBadge').innerText = "⏳ Обновление...";
             if (type === 'gps') {
                 navigator.geolocation.getCurrentPosition(
                     pos => fetchByCoords(pos.coords.latitude, pos.coords.longitude),
-                    err => alert("GPS не доступен")
+                    err => { alert("Включите GPS"); }
                 );
             } else {
                 const city = document.getElementById('cityInput').value;
@@ -313,11 +344,12 @@
         }
 
         function renderAll() {
-            const ruNames = {Fajr:"Фаджр", Sunrise:"Восход", Dhuhr:"Зухр", Asr:"Аср", Maghrib:"Магриб", Isha:"Иша"};
             const list = document.getElementById('scheduleList');
             const homeList = document.getElementById('homeScheduleList');
             list.innerHTML = ""; homeList.innerHTML = "";
+            const ruNames = {Fajr:"Фаджр", Sunrise:"Восход", Dhuhr:"Зухр", Asr:"Аср", Maghrib:"Магриб", Isha:"Иша"};
 
+            // Найти следующий намаз
             const now = new Date();
             const nowMins = now.getHours() * 60 + now.getMinutes();
             let nextName = "Fajr", nextTime = currentTimings["Fajr"];
@@ -335,7 +367,6 @@
                 }
             });
 
-            // Обновляем HERO
             document.getElementById('nextPrayerName').innerText = ruNames[nextName];
             document.getElementById('nextPrayerTime').innerText = nextTime;
             updateHeroVisuals(nextName);
@@ -346,7 +377,7 @@
             const icon = document.getElementById('heroIcon');
             
             if (prayer === 'Fajr' || prayer === 'Sunrise') {
-                card.style.background = "linear-gradient(135deg, #2c3e50, #4ca1af)"; // Ночь
+                card.style.background = "linear-gradient(135deg, #2c3e50, #4ca1af)"; // Ночь/Утро
                 icon.innerText = "🌙";
             } else if (prayer === 'Dhuhr' || prayer === 'Asr') {
                 card.style.background = "linear-gradient(135deg, #56CCF2, #2F80ED)"; // День
@@ -358,14 +389,6 @@
                 card.style.background = "linear-gradient(135deg, #141E30, #243B55)"; // Иша
                 icon.innerText = "🌌";
             }
-        }
-
-        // --- TABS & THEME ---
-        function switchTab(tab, btn) {
-            document.querySelectorAll('.container').forEach(e => e.classList.remove('active'));
-            document.getElementById('tab-'+tab).classList.add('active');
-            document.querySelectorAll('.tab-btn').forEach(e => e.classList.remove('active'));
-            btn.classList.add('active');
         }
 
         function toggleTheme() {

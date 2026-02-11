@@ -6,7 +6,7 @@
     <title>Muslim App</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        /* iOS-стиль + тёмная тема */
+        /* --- Muslim iOS Minimalist Theme --- */
         * {
             margin: 0;
             padding: 0;
@@ -15,54 +15,63 @@
         }
 
         :root {
-            --bg: #f2f2f7;
-            --card-bg: rgba(255,255,255,0.9);
-            --text: #1c1c1e;
-            --secondary-text: #8e8e93;
-            --border: rgba(60,60,67,0.1);
-            --accent: #007aff;
-            --success: #34c759;
-            --warning: #ffcc00;
-            --danger: #ff3b30;
+            --bg: #F5F7F5; /* Очень светлый серо-зеленый оттенок */
+            --card-bg: #FFFFFF;
+            --text: #111827;
+            --secondary-text: #6B7280;
+            --border: rgba(0,0,0,0.05);
+            
+            /* Изумрудный акцент (Muslim Style) */
+            --accent: #10B981; 
+            --accent-dim: rgba(16, 185, 129, 0.1);
+            
+            --success: #34D399;
+            --warning: #FBBF24;
+            --danger: #EF4444;
+            
+            --shadow: 0 4px 20px rgba(0,0,0,0.03);
+            --radius: 20px;
         }
 
         @media (prefers-color-scheme: dark) {
             :root {
                 --bg: #000000;
-                --card-bg: rgba(28,28,30,0.9);
-                --text: #ffffff;
-                --secondary-text: #8e8e93;
-                --border: rgba(84,84,88,0.2);
-                --accent: #0a84ff;
-                --success: #32d74b;
-                --warning: #ffd60a;
-                --danger: #ff453a;
+                --card-bg: #1C1C1E;
+                --text: #FFFFFF;
+                --secondary-text: #9CA3AF;
+                --border: rgba(255,255,255,0.1);
+                --accent: #34D399;
+                --accent-dim: rgba(52, 211, 153, 0.15);
             }
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, sans-serif;
             background: var(--bg);
             color: var(--text);
-            line-height: 1.4;
-            padding-bottom: 90px;
+            line-height: 1.5;
+            padding-bottom: 100px;
             min-height: 100vh;
-            transition: background 0.2s, color 0.2s;
+            -webkit-font-smoothing: antialiased;
         }
 
+        /* --- TABS --- */
         .tabs {
             position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: var(--card-bg);
+            bottom: 20px;
+            left: 20px;
+            right: 20px;
+            background: var(--card-bg); /* Плашка в воздухе */
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
             display: flex;
             justify-content: space-around;
-            padding: 8px 0 20px;
-            border-top: 0.5px solid var(--border);
+            padding: 12px;
+            border-radius: 24px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
             z-index: 100;
+            max-width: 400px;
+            margin: 0 auto;
         }
 
         .tab {
@@ -70,440 +79,319 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 6px 0;
             color: var(--secondary-text);
             font-size: 10px;
             font-weight: 500;
-            transition: color 0.2s;
             cursor: pointer;
-            border: none;
-            background: transparent;
+            transition: transform 0.2s, color 0.2s;
         }
+        
+        .tab:active { transform: scale(0.9); }
 
         .tab.active {
             color: var(--accent);
         }
 
-        .tab span {
-            font-size: 22px;
-            margin-bottom: 2px;
+        .tab svg {
+            width: 24px;
+            height: 24px;
+            margin-bottom: 4px;
+            fill: currentColor;
         }
 
         .content {
-            padding: 16px;
+            padding: 20px;
             max-width: 480px;
             margin: 0 auto;
         }
 
         .page {
             display: none;
+            opacity: 0;
+            transition: opacity 0.3s ease;
         }
 
         .page.active {
             display: block;
-            animation: fadeIn 0.3s ease;
+            opacity: 1;
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0.6; transform: translateY(8px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
+        /* --- CARDS --- */
         .card {
             background: var(--card-bg);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-radius: 14px;
-            padding: 20px;
+            border-radius: var(--radius);
+            padding: 24px;
             margin-bottom: 16px;
-            box-shadow: 0 2px 12px rgba(0,0,0,0.04);
-            border: 0.5px solid var(--border);
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
         }
 
-        .card h2 {
+        h2 {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            color: var(--text);
+            letter-spacing: -0.5px;
+        }
+
+        /* --- HERO: NEXT PRAYER --- */
+        .hero-card {
+            text-align: center;
+            background: linear-gradient(135deg, var(--accent), #059669);
+            color: white;
+            padding: 30px 20px;
+            border-radius: 24px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(16, 185, 129, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .hero-pattern {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            opacity: 0.1;
+            background-image: radial-gradient(circle at 2px 2px, white 1px, transparent 0);
+            background-size: 20px 20px;
+        }
+
+        .next-label {
+            font-size: 14px;
+            opacity: 0.9;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+            position: relative;
+        }
+
+        .next-name {
+            font-size: 36px;
+            font-weight: 800;
+            margin-bottom: 4px;
+            position: relative;
+        }
+
+        .next-timer {
+            font-size: 16px;
+            font-weight: 500;
+            opacity: 0.9;
+            background: rgba(255,255,255,0.2);
+            padding: 6px 16px;
+            border-radius: 20px;
+            display: inline-block;
+            margin-top: 10px;
+            position: relative;
+        }
+
+        /* --- PRAYER LIST --- */
+        .prayer-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 0;
+            border-bottom: 1px solid var(--border);
+            transition: background 0.2s;
+        }
+        
+        .prayer-row:last-child { border-bottom: none; }
+        
+        .prayer-row.current-prayer {
+            background: var(--accent-dim);
+            margin: 0 -24px;
+            padding: 16px 24px;
+            border-left: 4px solid var(--accent);
+        }
+
+        .p-name {
+            font-size: 17px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .p-time {
             font-size: 18px;
             font-weight: 600;
-            margin-bottom: 16px;
-            color: var(--text);
-            letter-spacing: -0.3px;
-        }
-
-        .current-time {
-            font-size: 42px;
-            font-weight: 700;
-            color: var(--text);
-            text-align: center;
-            margin: 8px 0;
             font-feature-settings: "tnum";
-        }
-
-        .prayer-time {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 12px 0;
-            border-bottom: 0.5px solid var(--border);
-        }
-
-        .prayer-time:last-child {
-            border-bottom: none;
-        }
-
-        .prayer-name {
-            font-size: 17px;
-            font-weight: 400;
-            color: var(--text);
-        }
-
-        .prayer-time-value {
-            font-size: 19px;
-            font-weight: 600;
-            color: var(--accent);
-            font-feature-settings: "tnum";
-        }
-
-        .prayer-emoji {
-            font-size: 24px;
-            margin-right: 12px;
-            vertical-align: middle;
-        }
-
-        .search-row {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 12px;
-        }
-
-        input[type="text"] {
-            flex: 1;
-            padding: 14px 16px;
-            background: rgba(118,118,128,0.08);
-            border: 0.5px solid var(--border);
-            border-radius: 10px;
-            font-size: 17px;
-            color: var(--text);
-            transition: all 0.2s;
-        }
-
-        input[type="text"]:focus {
-            outline: none;
-            border-color: var(--accent);
-            background: var(--card-bg);
-        }
-
-        input[type="text"]::placeholder {
             color: var(--secondary-text);
         }
+        
+        .current-prayer .p-time { color: var(--accent); }
+        .current-prayer .p-name { color: var(--accent); font-weight: 700; }
 
-        button {
+        /* --- BUTTONS --- */
+        .btn {
+            width: 100%;
             border: none;
-            border-radius: 12px;
-            padding: 14px 20px;
+            border-radius: 16px;
+            padding: 16px;
             font-size: 17px;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.2s;
-            background: var(--accent);
-            color: white;
-            box-shadow: 0 2px 8px rgba(0,122,255,0.2);
-        }
-
-        button:active {
-            opacity: 0.8;
-            transform: scale(0.98);
-        }
-
-        .btn-outline {
-            background: transparent;
-            border: 1.5px solid var(--accent);
-            color: var(--accent);
-            box-shadow: none;
-        }
-
-        .btn-outline:active {
-            background: rgba(10,132,255,0.05);
-        }
-
-        .btn-success {
-            background: var(--success);
-            box-shadow: 0 2px 8px rgba(52,199,89,0.2);
-        }
-
-        .btn-secondary {
-            background: rgba(118,118,128,0.08);
-            color: var(--accent);
-            box-shadow: none;
-        }
-
-        .btn-secondary:active {
-            background: rgba(118,118,128,0.2);
-        }
-
-        .counter-display {
-            font-size: 80px;
-            font-weight: 700;
-            color: var(--text);
+            transition: transform 0.1s;
             text-align: center;
-            margin: 20px 0;
-            font-feature-settings: "tnum";
-        }
-
-        .counter-button {
-            width: 220px;
-            height: 220px;
-            border-radius: 50%;
-            background: var(--accent);
-            color: white;
-            font-size: 28px;
-            border: none;
-            margin: 16px auto;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 8px 24px rgba(0,122,255,0.3);
-            transition: all 0.15s;
-        }
-
-        .counter-button:active {
-            transform: scale(0.94);
-            box-shadow: 0 4px 12px rgba(0,122,255,0.3);
-        }
-
-        .progress-bar {
-            height: 6px;
-            background: rgba(118,118,128,0.1);
-            border-radius: 3px;
-            overflow: hidden;
-            margin: 16px 0;
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: var(--accent);
-            width: 0%;
-            transition: width 0.2s;
-            border-radius: 3px;
-        }
-
-        .setting-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 14px 0;
-            border-bottom: 0.5px solid var(--border);
-        }
-
-        .switch {
-            position: relative;
-            display: inline-block;
-            width: 51px;
-            height: 31px;
-        }
-
-        .switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
-
-        .slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: #e9e9ea;
-            transition: .2s;
-            border-radius: 31px;
-        }
-
-        .slider:before {
-            position: absolute;
-            content: "";
-            height: 29px;
-            width: 29px;
-            left: 1px;
-            bottom: 1px;
-            background-color: white;
-            transition: .2s;
-            border-radius: 50%;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-
-        input:checked + .slider {
-            background-color: var(--success);
-        }
-
-        input:checked + .slider:before {
-            transform: translateX(20px);
-        }
-
-        .debug-info {
-            font-size: 12px;
-            color: var(--secondary-text);
-            background: rgba(118,118,128,0.05);
-            padding: 12px;
-            border-radius: 10px;
-            margin-top: 12px;
-            font-family: 'SF Mono', monospace;
-        }
-
-        .warning {
-            background: rgba(255,204,0,0.1);
-            border-left: 4px solid var(--warning);
-            padding: 14px;
-            border-radius: 10px;
-            color: var(--secondary-text);
-            font-size: 14px;
-            margin: 16px 0;
-        }
-
-        .geo-status {
-            font-size: 14px;
-            color: var(--success);
-            margin-top: 8px;
-            font-weight: 500;
-        }
-
-        .info {
-            color: var(--secondary-text);
-            font-size: 13px;
-            text-align: center;
-            margin-top: 12px;
-        }
-
-        .saved-city-badge {
-            display: inline-block;
-            background: rgba(10,132,255,0.1);
-            border-radius: 8px;
-            padding: 8px 12px;
-            font-size: 14px;
-            color: var(--accent);
             margin-top: 10px;
         }
+        
+        .btn:active { transform: scale(0.98); }
+        
+        .btn-primary {
+            background: var(--accent);
+            color: white;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+        }
+        
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text);
+        }
+        
+        .search-container {
+            position: relative;
+            margin-bottom: 12px;
+        }
+        
+        .search-input {
+            width: 100%;
+            padding: 16px;
+            padding-right: 50px;
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            background: var(--bg);
+            font-size: 16px;
+            color: var(--text);
+        }
+        
+        .search-btn {
+            position: absolute;
+            right: 8px;
+            top: 8px;
+            background: var(--accent);
+            color: white;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        /* --- TASBIH --- */
+        .counter-circle {
+            width: 240px;
+            height: 240px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%, var(--accent), #059669);
+            margin: 20px auto;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            box-shadow: 0 10px 40px rgba(16, 185, 129, 0.4);
+            cursor: pointer;
+            transition: transform 0.1s;
+        }
+        
+        .counter-circle:active { transform: scale(0.95); }
+        
+        .counter-val { font-size: 72px; font-weight: 700; line-height: 1; }
+        .counter-lbl { font-size: 16px; opacity: 0.8; margin-top: 8px; }
+
+        /* --- UTILS --- */
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            background: var(--accent-dim);
+            color: var(--accent);
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            margin-top: 10px;
+        }
+
+        .switch { position: relative; display: inline-block; width: 50px; height: 30px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #E5E7EB; transition: .4s; border-radius: 34px; }
+        .slider:before { position: absolute; content: ""; height: 26px; width: 26px; left: 2px; bottom: 2px; background-color: white; transition: .4s; border-radius: 50%; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        input:checked + .slider { background-color: var(--accent); }
+        input:checked + .slider:before { transform: translateX(20px); }
     </style>
 </head>
 <body>
-    <div class="tabs">
-        <div class="tab active" onclick="switchTab(event, 'prayer')">
-            <span>🕌</span>
-            <span>Намаз</span>
-        </div>
-        <div class="tab" onclick="switchTab(event, 'tasbih')">
-            <span>📿</span>
-            <span>Тасбих</span>
-        </div>
-        <div class="tab" onclick="switchTab(event, 'settings')">
-            <span>⚙️</span>
-            <span>Настройки</span>
-        </div>
-    </div>
 
     <div class="content">
         <div id="prayer" class="page active">
-            <div class="card">
-                <h2>🕐 Текущее время</h2>
-                <div class="current-time" id="currentTime">--:--:--</div>
-                <div class="debug-info">
-                    Часовой пояс: <span id="timezoneInfo">--</span><br>
-                    Offset: <span id="offsetInfo">--</span> мин
-                </div>
+            
+            <div class="hero-card" id="heroCard" style="display: none;">
+                <div class="hero-pattern"></div>
+                <div class="next-label">Следующий намаз</div>
+                <div class="next-name" id="nextPrayerName">--</div>
+                <div class="next-timer" id="nextPrayerTimer">--:--:--</div>
             </div>
 
             <div class="card">
-                <h2>📍 Определение местоположения</h2>
-                <div class="search-row">
-                    <input type="text" id="cityInput" placeholder="Город (например, Baku, Qusar)">
-                    <button class="btn-outline" onclick="geocodeAndFetchCity()">Найти</button>
+                <div class="search-container">
+                    <input type="text" class="search-input" id="cityInput" placeholder="Поиск города (напр. Baku)">
+                    <button class="search-btn" onclick="geocodeAndFetchCity()">🔍</button>
                 </div>
-                <div style="display: flex; gap: 10px; margin-bottom: 8px;">
-                    <button class="btn-outline" onclick="getLocationAndFetchTimes()" style="flex: 1;">
-                        📍 Авто
-                    </button>
-                    <button class="btn-outline" onclick="clearSavedLocation()" style="flex: 1;">
-                        🗑️ Сменить
-                    </button>
+                
+                <div style="display: flex; gap: 10px;">
+                    <button class="btn btn-outline" onclick="getLocationAndFetchTimes()" style="margin-top: 0;">📍 GPS</button>
+                    <button class="btn btn-outline" onclick="clearSavedLocation()" style="margin-top: 0;">🗑 Сброс</button>
                 </div>
-                <div id="geoStatus" class="geo-status"></div>
-                <div id="savedCityInfo" class="saved-city-badge" style="display: none;"></div>
+                
+                <div id="geoStatus" style="margin-top: 12px; font-size: 14px; color: var(--secondary-text); text-align: center;"></div>
             </div>
 
             <div class="card" id="prayerTimesCard" style="display:none;">
-                <h2 id="cityName">Время намаза</h2>
-                <div class="debug-info" id="coordsDebug"></div>
+                <h2 id="cityName" style="font-size: 22px;">Расписание</h2>
                 
-                <div class="warning">
-                    ⏰ Уведомления приходят <strong>точно во время намаза</strong>.<br>
-                    🌍 Метод: MWL (Угол 18°/17°) | Мазхаб: Шафиитский
+                <div id="prayerList">
+                    </div>
+                
+                <button class="btn btn-primary" onclick="saveToBot()">
+                    📡 Сохранить настройки
+                </button>
+                <div style="text-align: center; font-size: 12px; color: var(--secondary-text); margin-top: 12px;">
+                    Бот будет присылать уведомления
                 </div>
-                
-                <div style="margin: 16px 0;">
-                    <div class="prayer-time">
-                        <div><span class="prayer-emoji">🌅</span><span class="prayer-name">Фаджр</span></div>
-                        <span class="prayer-time-value" id="timeFajr">--:--</span>
-                    </div>
-                    <div class="prayer-time">
-                        <div><span class="prayer-emoji">☀️</span><span class="prayer-name">Зухр</span></div>
-                        <span class="prayer-time-value" id="timeDhuhr">--:--</span>
-                    </div>
-                    <div class="prayer-time">
-                        <div><span class="prayer-emoji">🌤</span><span class="prayer-name">Аср</span></div>
-                        <span class="prayer-time-value" id="timeAsr">--:--</span>
-                    </div>
-                    <div class="prayer-time">
-                        <div><span class="prayer-emoji">🌇</span><span class="prayer-name">Магриб</span></div>
-                        <span class="prayer-time-value" id="timeMaghrib">--:--</span>
-                    </div>
-                    <div class="prayer-time">
-                        <div><span class="prayer-emoji">🌙</span><span class="prayer-name">Иша</span></div>
-                        <span class="prayer-time-value" id="timeIsha">--:--</span>
-                    </div>
-                </div>
-                
-                <button class="btn-success" onclick="saveToBot()">📡 Сохранить в бота</button>
-                <div class="info">После сохранения бот будет присылать уведомления</div>
             </div>
         </div>
 
         <div id="tasbih" class="page">
-            <div class="card" style="text-align: center;">
-                <h2>📿 Тасбих</h2>
-                <div class="counter-display" id="counterDisplay">0</div>
-                
-                <div class="progress-bar">
-                    <div class="progress-fill" id="progressFill" style="width: 0%;"></div>
-                </div>
-                
-                <button class="counter-button" onclick="incrementCounter()">
-                    <span style="font-size: 48px;">☝️</span>
-                    <span style="font-size: 18px; margin-top: 12px;">Нажми</span>
-                </button>
-                
-                <div class="target-info" id="targetInfo">Цель: 33</div>
-                
-                <div class="tasbih-controls" style="display: flex; gap: 8px; margin-top: 24px;">
-                    <button class="btn-secondary" onclick="setTarget(33)">33</button>
-                    <button class="btn-secondary" onclick="setTarget(99)">99</button>
-                    <button class="btn-secondary" onclick="setTarget(100)">100</button>
-                    <button class="btn-secondary" onclick="resetCounter()">Сброс</button>
-                </div>
+            <div class="counter-circle" onclick="incrementCounter()">
+                <div class="counter-val" id="counterDisplay">0</div>
+                <div class="counter-lbl">Нажмите</div>
             </div>
             
+            <div class="card" style="text-align: center;">
+                <div id="targetInfo" style="font-size: 18px; font-weight: 600; color: var(--accent); margin-bottom: 16px;">Цель: 33</div>
+                <div style="display: flex; gap: 8px; justify-content: center;">
+                    <button class="btn btn-outline" onclick="setTarget(33)" style="width: auto; padding: 10px 20px;">33</button>
+                    <button class="btn btn-outline" onclick="setTarget(99)" style="width: auto; padding: 10px 20px;">99</button>
+                    <button class="btn btn-outline" onclick="resetCounter()" style="width: auto; padding: 10px 20px; border-color: var(--danger); color: var(--danger);">Сброс</button>
+                </div>
+            </div>
+
             <div class="card">
-                <h2>📖 Зикры</h2>
-                <div style="padding: 10px 0; border-bottom: 0.5px solid var(--border);">
-                    <div style="font-weight: 600; margin-bottom: 4px;">سُبْحَانَ اللهِ</div>
-                    <div style="color: var(--secondary-text); font-size: 15px;">Субханаллах (33)</div>
+                <div style="display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--border);">
+                    <span style="font-size: 18px;">سبحان الله</span>
+                    <span style="color: var(--secondary-text);">Субханаллах</span>
                 </div>
-                <div style="padding: 10px 0; border-bottom: 0.5px solid var(--border);">
-                    <div style="font-weight: 600; margin-bottom: 4px;">الْحَمْدُ لِلَّهِ</div>
-                    <div style="color: var(--secondary-text); font-size: 15px;">Альхамдулиллах (33)</div>
+                <div style="display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--border);">
+                    <span style="font-size: 18px;">الحمد لله</span>
+                    <span style="color: var(--secondary-text);">Альхамдулиллах</span>
                 </div>
-                <div style="padding: 10px 0;">
-                    <div style="font-weight: 600; margin-bottom: 4px;">اللهُ أَكْبЕРُ</div>
-                    <div style="color: var(--secondary-text); font-size: 15px;">Аллаху Акбар (34)</div>
+                <div style="display: flex; justify-content: space-between; padding: 12px 0;">
+                    <span style="font-size: 18px;">الله أكبر</span>
+                    <span style="color: var(--secondary-text);">Аллаху Акбар</span>
                 </div>
             </div>
         </div>
@@ -511,60 +399,36 @@
         <div id="settings" class="page">
             <div class="card">
                 <h2>🔔 Уведомления</h2>
-                <div class="setting-item">
-                    <span>🌅 Фаджр</span>
-                    <label class="switch">
-                        <input type="checkbox" id="notifFajr" checked onchange="saveNotificationSettings()">
-                        <span class="slider"></span>
-                    </label>
-                </div>
-                <div class="setting-item">
-                    <span>☀️ Зухр</span>
-                    <label class="switch">
-                        <input type="checkbox" id="notifDhuhr" checked onchange="saveNotificationSettings()">
-                        <span class="slider"></span>
-                    </label>
-                </div>
-                <div class="setting-item">
-                    <span>🌤 Аср</span>
-                    <label class="switch">
-                        <input type="checkbox" id="notifAsr" checked onchange="saveNotificationSettings()">
-                        <span class="slider"></span>
-                    </label>
-                </div>
-                <div class="setting-item">
-                    <span>🌇 Магриб</span>
-                    <label class="switch">
-                        <input type="checkbox" id="notifMaghrib" checked onchange="saveNotificationSettings()">
-                        <span class="slider"></span>
-                    </label>
-                </div>
-                <div class="setting-item">
-                    <span>🌙 Иша</span>
-                    <label class="switch">
-                        <input type="checkbox" id="notifIsha" checked onchange="saveNotificationSettings()">
-                        <span class="slider"></span>
-                    </label>
-                </div>
+                <div id="settingsList">
+                    </div>
             </div>
-
+            
             <div class="card">
-                <h2>⚙️ Параметры расчёта</h2>
-                <div style="margin-bottom: 8px; color: var(--text);">Метод: 3 (Всемирная Исламская Лига)</div>
-                <div style="color: var(--secondary-text); font-size: 15px;">Мазхаб: Шафиитский (Аср)</div>
-            </div>
-
-            <div class="card">
-                <h2>ℹ️ О приложении</h2>
-                <p style="color: var(--text); line-height: 1.5;">
-                    Точное время намаза по методу MWL (Угол 18/17).<br>
-                    Геолокация, ручной поиск, тасбих, уведомления.
+                <h2>ℹ️ Информация</h2>
+                <p style="color: var(--secondary-text); font-size: 14px;">
+                    Метод расчёта: <strong>MWL (World Islamic League)</strong><br>
+                    Углы: 18° / 17°<br>
+                    Мазхаб: Шафиитский
                 </p>
-                <div style="margin-top: 16px; padding-top: 16px; border-top: 0.5px solid var(--border); color: var(--secondary-text); font-size: 13px;">
-                    Версия 7.0 (Синхронизация с MWL)<br>
-                    © 2026 Muslim App
+                <div style="margin-top: 16px; font-size: 12px; color: var(--accent);">
+                    Version 8.0 Muslim Style
                 </div>
             </div>
+        </div>
+    </div>
+
+    <div class="tabs">
+        <div class="tab active" onclick="switchTab(event, 'prayer')">
+            <svg viewBox="0 0 24 24"><path d="M12 2L2 12h3v8h6v-6h2v6h6v-8h3L12 2z"/></svg>
+            <span>Намаз</span>
+        </div>
+        <div class="tab" onclick="switchTab(event, 'tasbih')">
+            <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/><circle cx="12" cy="12" r="3"/></svg>
+            <span>Тасбих</span>
+        </div>
+        <div class="tab" onclick="switchTab(event, 'settings')">
+            <svg viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58a.49.49 0 0 0 .12-.61l-1.92-3.32a.488.488 0 0 0-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54a.484.484 0 0 0-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.04.17 0 .36.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58a.49.49 0 0 0-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.04-.22 0-.45-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
+            <span>Настройки</span>
         </div>
     </div>
 
@@ -572,102 +436,148 @@
         const tg = window.Telegram.WebApp;
         tg.expand();
 
-        if (tg.themeParams && tg.themeParams.bg_color) {
-            document.documentElement.style.setProperty('--bg', tg.themeParams.bg_color);
-            document.documentElement.style.setProperty('--text', tg.themeParams.text_color);
-            document.documentElement.style.setProperty('--accent', tg.themeParams.button_color);
-            document.documentElement.style.setProperty('--border', tg.themeParams.hint_color || 'rgba(84,84,88,0.2)');
-        }
-
-        let foundLat = 0;
-        let foundLon = 0;
-        let foundTimezone = '';
-        let foundCityName = '';
-        const SCHOOL = 0; 
-        const METHOD = 3; // ИЗМЕНЕНО НА 3 (MWL)
+        // --- GLOBAL VARS ---
+        let currentTimings = null;
+        let foundLat = 0, foundLon = 0, foundTimezone = '';
+        const METHOD = 3; 
+        const SCHOOL = 0;
 
         let counter = parseInt(localStorage.getItem('tasbihCounter') || '0');
         let target = parseInt(localStorage.getItem('tasbihTarget') || '33');
 
-        updateCounterDisplay();
-        loadNotificationSettings();
-        updateCurrentTime();
-        setInterval(updateCurrentTime, 1000);
-
+        // --- INIT ---
         window.addEventListener('load', () => {
+            updateCounterDisplay();
+            renderSettings();
             loadSavedLocation();
+            setInterval(updateNextPrayerUI, 1000);
         });
 
-        function switchTab(event, tabName) {
+        // --- TABS ---
+        function switchTab(e, id) {
             document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            event.currentTarget.classList.add('active');
-            document.getElementById(tabName).classList.add('active');
+            e.currentTarget.classList.add('active');
+            document.getElementById(id).classList.add('active');
         }
 
-        function updateCurrentTime() {
+        // --- LOGIC: NEXT PRAYER & UI ---
+        function updateNextPrayerUI() {
+            if (!currentTimings) return;
+            
             const now = new Date();
-            document.getElementById('currentTime').textContent = 
-                `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}:${String(now.getSeconds()).padStart(2,'0')}`;
-            const offset = now.getTimezoneOffset();
-            document.getElementById('timezoneInfo').textContent = `UTC${offset<=0?'+':'-'}${Math.abs(offset/60)}`;
-            document.getElementById('offsetInfo').textContent = offset;
+            const timeNowStr = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+            
+            const prayers = [
+                { en: 'Fajr', ru: 'Фаджр', icon: '🌅' },
+                { en: 'Dhuhr', ru: 'Зухр', icon: '☀️' },
+                { en: 'Asr', ru: 'Аср', icon: '🌤' },
+                { en: 'Maghrib', ru: 'Магриб', icon: '🌇' },
+                { en: 'Isha', ru: 'Иша', icon: '🌙' }
+            ];
+
+            let nextP = null;
+            let minDiff = Infinity;
+
+            // Находим следующий намаз
+            for (let p of prayers) {
+                const pTime = currentTimings[p.en];
+                const [h, m] = pTime.split(':').map(Number);
+                let pDate = new Date();
+                pDate.setHours(h, m, 0, 0);
+
+                if (pDate < now) {
+                    pDate.setDate(pDate.getDate() + 1); // Если время прошло, значит это завтра
+                }
+
+                const diff = pDate - now;
+                if (diff < minDiff) {
+                    minDiff = diff;
+                    nextP = { ...p, date: pDate };
+                }
+            }
+
+            // UI Update: Hero Card
+            if (nextP) {
+                document.getElementById('heroCard').style.display = 'block';
+                document.getElementById('nextPrayerName').textContent = nextP.ru;
+                
+                const hours = Math.floor(minDiff / (1000 * 60 * 60));
+                const minutes = Math.floor((minDiff % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((minDiff % (1000 * 60)) / 1000);
+                
+                document.getElementById('nextPrayerTimer').textContent = 
+                    `Через ${hours}:${String(minutes).padStart(2,'0')}:${String(seconds).padStart(2,'0')}`;
+            }
+
+            // UI Update: Highlight Row
+            // Сброс подсветки
+            document.querySelectorAll('.prayer-row').forEach(row => row.classList.remove('current-prayer'));
+            // Логика: подсвечиваем тот, что СЕЙЧАС (прошлый), или следующий? 
+            // Обычно подсвечивают следующий как "актуальный".
+            if (nextP) {
+                const rowId = `row-${nextP.en}`;
+                const el = document.getElementById(rowId);
+                if (el) el.classList.add('current-prayer');
+            }
         }
 
+        function renderPrayerList(timings) {
+            currentTimings = timings;
+            const container = document.getElementById('prayerList');
+            container.innerHTML = '';
+            
+            const map = [
+                { k: 'Fajr', n: 'Фаджр', i: '🌅' },
+                { k: 'Dhuhr', n: 'Зухр', i: '☀️' },
+                { k: 'Asr', n: 'Аср', i: '🌤' },
+                { k: 'Maghrib', n: 'Магриб', i: '🌇' },
+                { k: 'Isha', n: 'Иша', i: '🌙' }
+            ];
+
+            map.forEach(item => {
+                const time = timings[item.k];
+                container.innerHTML += `
+                    <div class="prayer-row" id="row-${item.k}">
+                        <div class="p-name"><span>${item.i}</span> ${item.n}</div>
+                        <div class="p-time">${time}</div>
+                    </div>
+                `;
+            });
+            updateNextPrayerUI();
+        }
+
+        // --- SETTINGS RENDER ---
+        function renderSettings() {
+            const list = document.getElementById('settingsList');
+            const saved = JSON.parse(localStorage.getItem('notificationSettings') || '{}');
+            const map = [
+                { k: 'Fajr', n: 'Фаджр' },
+                { k: 'Dhuhr', n: 'Зухр' },
+                { k: 'Asr', n: 'Аср' },
+                { k: 'Maghrib', n: 'Магриб' },
+                { k: 'Isha', n: 'Иша' }
+            ];
+            
+            list.innerHTML = '';
+            map.forEach(item => {
+                const isChecked = saved[item.k] !== false ? 'checked' : '';
+                list.innerHTML += `
+                    <div class="setting-item" style="display:flex; justify-content:space-between; padding:12px 0; border-bottom:1px solid var(--border);">
+                        <span>${item.n}</span>
+                        <label class="switch">
+                            <input type="checkbox" id="notif${item.k}" ${isChecked} onchange="saveNotificationSettings()">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                `;
+            });
+        }
+
+        // --- LOCATION & API ---
         const STORAGE_KEY = 'muslim_app_location';
 
-        function saveLocationToStorage(lat, lon, timezone, cityName) {
-            const data = { lat, lon, timezone, cityName, timestamp: Date.now() };
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-            document.getElementById('savedCityInfo').style.display = 'inline-block';
-            document.getElementById('savedCityInfo').innerHTML = `📍 Текущий город: ${cityName}`;
-        }
-
-        function loadSavedLocation() {
-            const saved = localStorage.getItem(STORAGE_KEY);
-            if (saved) {
-                try {
-                    const data = JSON.parse(saved);
-                    fetchPrayerTimesByCoords(data.lat, data.lon, data.cityName);
-                } catch (e) {
-                    setTimeout(() => getLocationAndFetchTimes(), 1000);
-                }
-            } else {
-                setTimeout(() => getLocationAndFetchTimes(), 1000);
-            }
-        }
-
-        function clearSavedLocation() {
-            localStorage.removeItem(STORAGE_KEY);
-            foundLat = 0;
-            foundLon = 0;
-            document.getElementById('prayerTimesCard').style.display = 'none';
-            document.getElementById('savedCityInfo').style.display = 'none';
-            document.getElementById('geoStatus').innerHTML = '🔄 Сброшено. Выберите город.';
-            document.getElementById('geoStatus').style.color = 'var(--secondary-text)';
-        }
-
-        function getLocationAndFetchTimes() {
-            const status = document.getElementById('geoStatus');
-            status.innerHTML = '⏳ Определяем...';
-            status.style.color = 'var(--accent)';
-            if (!navigator.geolocation) {
-                status.innerHTML = '❌ Нет поддержки GPS';
-                return;
-            }
-            navigator.geolocation.getCurrentPosition(
-                (pos) => {
-                    fetchPrayerTimesByCoords(pos.coords.latitude, pos.coords.longitude, 'Ваше местоположение');
-                },
-                (err) => {
-                    status.innerHTML = '❌ Ошибка GPS';
-                    status.style.color = 'var(--danger)';
-                },
-                { enableHighAccuracy: true, timeout: 10000 }
-            );
-        }
-
-        async function fetchPrayerTimesByCoords(lat, lon, displayName) {
+        async function fetchPrayerTimesByCoords(lat, lon, name) {
             try {
                 const date = new Date();
                 const dateStr = `${date.getDate().toString().padStart(2,'0')}-${(date.getMonth()+1).toString().padStart(2,'0')}-${date.getFullYear()}`;
@@ -677,133 +587,92 @@
                 const data = await res.json();
                 
                 if (data.code === 200) {
-                    foundLat = lat;
-                    foundLon = lon;
-                    foundTimezone = data.data.meta.timezone;
-                    foundCityName = displayName;
-
-                    document.getElementById('cityName').innerHTML = `🕌 ${displayName}`;
-                    document.getElementById('coordsDebug').innerHTML = `
-                        📍 ${lat.toFixed(4)}, ${lon.toFixed(4)}<br>
-                        🌍 ${foundTimezone} | Метод: MWL
-                    `;
-                    
-                    document.getElementById('timeFajr').innerText = data.data.timings.Fajr;
-                    document.getElementById('timeDhuhr').innerText = data.data.timings.Dhuhr;
-                    document.getElementById('timeAsr').innerText = data.data.timings.Asr;
-                    document.getElementById('timeMaghrib').innerText = data.data.timings.Maghrib;
-                    document.getElementById('timeIsha').innerText = data.data.timings.Isha;
+                    foundLat = lat; foundLon = lon; foundTimezone = data.data.meta.timezone;
+                    document.getElementById('cityName').textContent = name;
+                    renderPrayerList(data.data.timings);
                     
                     document.getElementById('prayerTimesCard').style.display = 'block';
-                    document.getElementById('geoStatus').innerHTML = '✅ Обновлено';
-                    document.getElementById('geoStatus').style.color = 'var(--success)';
+                    document.getElementById('heroCard').style.display = 'block';
                     
-                    saveLocationToStorage(lat, lon, foundTimezone, displayName);
-                    tg.HapticFeedback.notificationOccurred('success');
+                    localStorage.setItem(STORAGE_KEY, JSON.stringify({ lat, lon, timezone: foundTimezone, cityName: name }));
+                    document.getElementById('geoStatus').innerHTML = `✅ ${name}`;
                 }
             } catch (e) {
-                document.getElementById('geoStatus').innerHTML = '❌ Ошибка API';
+                document.getElementById('geoStatus').textContent = "Ошибка загрузки";
             }
+        }
+
+        function getLocationAndFetchTimes() {
+            const st = document.getElementById('geoStatus');
+            st.textContent = "⏳ Определяем...";
+            if(!navigator.geolocation) return;
+            navigator.geolocation.getCurrentPosition(
+                p => fetchPrayerTimesByCoords(p.coords.latitude, p.coords.longitude, "GPS Локация"),
+                e => st.textContent = "❌ Ошибка GPS"
+            );
         }
 
         async function geocodeAndFetchCity() {
-            let city = document.getElementById('cityInput').value.trim();
-            if (!city) return;
-
-            const status = document.getElementById('geoStatus');
-            status.innerHTML = `🔍 Поиск...`;
-            
+            const city = document.getElementById('cityInput').value;
+            if(!city) return;
+            const st = document.getElementById('geoStatus');
+            st.textContent = "🔍 Поиск...";
             try {
-                const geoRes = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(city)}&limit=1`, {
-                    headers: { 'User-Agent': 'MuslimApp-Telegram/1.0' }
-                });
-                const geoData = await geoRes.json();
-                if (geoData && geoData.length > 0) {
-                    const lat = parseFloat(geoData[0].lat);
-                    const lon = parseFloat(geoData[0].lon);
-                    const name = geoData[0].display_name.split(',')[0];
-                    await fetchPrayerTimesByCoords(lat, lon, name);
-                } else {
-                    status.innerHTML = '❌ Не найдено';
-                }
-            } catch (e) {
-                status.innerHTML = '❌ Ошибка поиска';
+                const r = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${city}&limit=1`);
+                const d = await r.json();
+                if(d.length) fetchPrayerTimesByCoords(d[0].lat, d[0].lon, d[0].display_name.split(',')[0]);
+                else st.textContent = "❌ Не найдено";
+            } catch { st.textContent = "❌ Ошибка сети"; }
+        }
+
+        function loadSavedLocation() {
+            const s = localStorage.getItem(STORAGE_KEY);
+            if(s) {
+                const d = JSON.parse(s);
+                fetchPrayerTimesByCoords(d.lat, d.lon, d.cityName);
             }
         }
 
+        function clearSavedLocation() {
+            localStorage.removeItem(STORAGE_KEY);
+            location.reload();
+        }
+
+        // --- BOT SYNC ---
         function saveToBot() {
-            if (foundLat === 0) return;
-            const offset = new Date().getTimezoneOffset();
+            if(!foundLat) return;
             tg.sendData(JSON.stringify({
-                action: 'sync_location',
-                lat: foundLat,
-                lon: foundLon,
-                offset: offset,
-                timezone: foundTimezone,
-                school: SCHOOL,
-                method: METHOD 
+                action: 'sync_location', lat: foundLat, lon: foundLon,
+                timezone: foundTimezone, school: SCHOOL, method: METHOD, 
+                offset: new Date().getTimezoneOffset()
             }));
-            tg.close();
         }
 
-        function incrementCounter() {
-            counter++;
-            localStorage.setItem('tasbihCounter', counter);
-            updateCounterDisplay();
-            if (counter === target) {
-                tg.HapticFeedback.notificationOccurred('success');
-                tg.showAlert(`🎉 Машаллах! Цель достигнута!`);
-            } else {
-                tg.HapticFeedback.impactOccurred('light');
-            }
-        }
-
-        function updateCounterDisplay() {
-            document.getElementById('counterDisplay').innerText = counter;
-            document.getElementById('targetInfo').innerText = `Цель: ${target}`;
-            document.getElementById('progressFill').style.width = `${Math.min(100, (counter / target) * 100)}%`;
-        }
-
-        function resetCounter() {
-            if (counter > 0) {
-                tg.showConfirm('Сбросить?', (ok) => {
-                    if (ok) {
-                        counter = 0;
-                        localStorage.setItem('tasbihCounter', '0');
-                        updateCounterDisplay();
-                    }
-                });
-            }
-        }
-
-        function setTarget(newTarget) {
-            target = newTarget;
-            localStorage.setItem('tasbihTarget', target);
-            updateCounterDisplay();
-        }
-
-        function loadNotificationSettings() {
-            const saved = localStorage.getItem('notificationSettings');
-            if (saved) {
-                const s = JSON.parse(saved);
-                document.getElementById('notifFajr').checked = s.Fajr !== false;
-                document.getElementById('notifDhuhr').checked = s.Dhuhr !== false;
-                document.getElementById('notifAsr').checked = s.Asr !== false;
-                document.getElementById('notifMaghrib').checked = s.Maghrib !== false;
-                document.getElementById('notifIsha').checked = s.Isha !== false;
-            }
-        }
-
+        // --- NOTIFICATIONS ---
         function saveNotificationSettings() {
-            const settings = {
-                Fajr: document.getElementById('notifFajr').checked,
-                Dhuhr: document.getElementById('notifDhuhr').checked,
-                Asr: document.getElementById('notifAsr').checked,
-                Maghrib: document.getElementById('notifMaghrib').checked,
-                Isha: document.getElementById('notifIsha').checked
-            };
+            const settings = {};
+            ['Fajr','Dhuhr','Asr','Maghrib','Isha'].forEach(k => {
+                settings[k] = document.getElementById(`notif${k}`).checked;
+            });
             localStorage.setItem('notificationSettings', JSON.stringify(settings));
             tg.sendData(JSON.stringify({ action: 'update_notifications', settings }));
+        }
+
+        // --- TASBIH ---
+        function updateCounterDisplay() {
+            document.getElementById('counterDisplay').innerText = counter;
+            document.getElementById('progressFill').style.width = `${Math.min(100, (counter / target) * 100)}%`;
+            document.getElementById('targetInfo').innerText = `Цель: ${target}`;
+        }
+        function incrementCounter() {
+            counter++; localStorage.setItem('tasbihCounter', counter);
+            updateCounterDisplay();
+            if(counter === target) tg.HapticFeedback.notificationOccurred('success');
+            else tg.HapticFeedback.impactOccurred('light');
+        }
+        function setTarget(t) { target = t; localStorage.setItem('tasbihTarget', t); updateCounterDisplay(); }
+        function resetCounter() { 
+            tg.showConfirm('Сбросить?', ok => { if(ok) { counter=0; localStorage.setItem('tasbihCounter',0); updateCounterDisplay(); }});
         }
     </script>
 </body>

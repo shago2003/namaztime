@@ -402,7 +402,6 @@
     </div>
 
     <div class="content">
-        <!-- СТРАНИЦА НАМАЗ -->
         <div id="prayer" class="page active">
             <div class="card">
                 <h2>🕐 Текущее время</h2>
@@ -436,8 +435,8 @@
                 <div class="debug-info" id="coordsDebug"></div>
                 
                 <div class="warning">
-                    ⏰ Уведомления приходят <strong>точно во время намаза</strong> (по местному времени города).<br>
-                    🕌 Мазхаб: Шафиитский (Аср) | Метод: 14 (Россия/Кавказ)
+                    ⏰ Уведомления приходят <strong>точно во время намаза</strong>.<br>
+                    🌍 Метод: MWL (Угол 18°/17°) | Мазхаб: Шафиитский
                 </div>
                 
                 <div style="margin: 16px 0;">
@@ -468,7 +467,6 @@
             </div>
         </div>
 
-        <!-- СТРАНИЦА ТАСБИХ -->
         <div id="tasbih" class="page">
             <div class="card" style="text-align: center;">
                 <h2>📿 Тасбих</h2>
@@ -504,13 +502,12 @@
                     <div style="color: var(--secondary-text); font-size: 15px;">Альхамдулиллах (33)</div>
                 </div>
                 <div style="padding: 10px 0;">
-                    <div style="font-weight: 600; margin-bottom: 4px;">اللهُ أَكْبَرُ</div>
+                    <div style="font-weight: 600; margin-bottom: 4px;">اللهُ أَكْبЕРُ</div>
                     <div style="color: var(--secondary-text); font-size: 15px;">Аллаху Акбар (34)</div>
                 </div>
             </div>
         </div>
 
-        <!-- СТРАНИЦА НАСТРОЙКИ -->
         <div id="settings" class="page">
             <div class="card">
                 <h2>🔔 Уведомления</h2>
@@ -553,20 +550,19 @@
 
             <div class="card">
                 <h2>⚙️ Параметры расчёта</h2>
-                <div style="margin-bottom: 8px; color: var(--text);">Метод: 14 (Россия/Кавказ) — фиксирован</div>
-                <div style="color: var(--secondary-text); font-size: 15px;">Мазхаб: Шафиитский (Аср) — фиксирован</div>
+                <div style="margin-bottom: 8px; color: var(--text);">Метод: 3 (Всемирная Исламская Лига)</div>
+                <div style="color: var(--secondary-text); font-size: 15px;">Мазхаб: Шафиитский (Аср)</div>
             </div>
 
             <div class="card">
                 <h2>ℹ️ О приложении</h2>
                 <p style="color: var(--text); line-height: 1.5;">
-                    Точное время намаза по методу 14 (Россия/Кавказ), шафиитский мазхаб.<br>
-                    Геолокация, ручной поиск (с точными координатами для Кусаров), тасбих, уведомления.<br>
-                    Последний выбранный город сохраняется автоматически.
+                    Точное время намаза по методу MWL (Угол 18/17).<br>
+                    Геолокация, ручной поиск, тасбих, уведомления.
                 </p>
                 <div style="margin-top: 16px; padding-top: 16px; border-top: 0.5px solid var(--border); color: var(--secondary-text); font-size: 13px;">
-                    Версия 6.0 (финальная, точная)<br>
-                    © 2025 Muslim App
+                    Версия 7.0 (Синхронизация с MWL)<br>
+                    © 2026 Muslim App
                 </div>
             </div>
         </div>
@@ -576,7 +572,6 @@
         const tg = window.Telegram.WebApp;
         tg.expand();
 
-        // Принудительно применяем тему Telegram
         if (tg.themeParams && tg.themeParams.bg_color) {
             document.documentElement.style.setProperty('--bg', tg.themeParams.bg_color);
             document.documentElement.style.setProperty('--text', tg.themeParams.text_color);
@@ -584,30 +579,25 @@
             document.documentElement.style.setProperty('--border', tg.themeParams.hint_color || 'rgba(84,84,88,0.2)');
         }
 
-        // --- Глобальные переменные ---
         let foundLat = 0;
         let foundLon = 0;
         let foundTimezone = '';
         let foundCityName = '';
-        const SCHOOL = 0; // 0 = Шафии (жёстко)
-        const METHOD = 14; // 14 = Россия/Кавказ (жёстко)
+        const SCHOOL = 0; 
+        const METHOD = 3; // ИЗМЕНЕНО НА 3 (MWL)
 
-        // Тасбих
         let counter = parseInt(localStorage.getItem('tasbihCounter') || '0');
         let target = parseInt(localStorage.getItem('tasbihTarget') || '33');
 
-        // --- Инициализация ---
         updateCounterDisplay();
         loadNotificationSettings();
         updateCurrentTime();
         setInterval(updateCurrentTime, 1000);
 
-        // При загрузке – попытаться загрузить сохранённое местоположение
         window.addEventListener('load', () => {
             loadSavedLocation();
         });
 
-        // --- Переключение табов ---
         function switchTab(event, tabName) {
             document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
@@ -615,7 +605,6 @@
             document.getElementById(tabName).classList.add('active');
         }
 
-        // --- Время устройства ---
         function updateCurrentTime() {
             const now = new Date();
             document.getElementById('currentTime').textContent = 
@@ -625,7 +614,6 @@
             document.getElementById('offsetInfo').textContent = offset;
         }
 
-        // --- Сохранение / загрузка локации в localStorage ---
         const STORAGE_KEY = 'muslim_app_location';
 
         function saveLocationToStorage(lat, lon, timezone, cityName) {
@@ -642,7 +630,6 @@
                     const data = JSON.parse(saved);
                     fetchPrayerTimesByCoords(data.lat, data.lon, data.cityName);
                 } catch (e) {
-                    console.warn('Ошибка загрузки сохранённой локации', e);
                     setTimeout(() => getLocationAndFetchTimes(), 1000);
                 }
             } else {
@@ -656,44 +643,34 @@
             foundLon = 0;
             document.getElementById('prayerTimesCard').style.display = 'none';
             document.getElementById('savedCityInfo').style.display = 'none';
-            document.getElementById('geoStatus').innerHTML = '🔄 Местоположение сброшено. Выберите город.';
+            document.getElementById('geoStatus').innerHTML = '🔄 Сброшено. Выберите город.';
             document.getElementById('geoStatus').style.color = 'var(--secondary-text)';
         }
 
-        // --- GPS ---
         function getLocationAndFetchTimes() {
             const status = document.getElementById('geoStatus');
-            status.innerHTML = '⏳ Определяем местоположение...';
+            status.innerHTML = '⏳ Определяем...';
             status.style.color = 'var(--accent)';
             if (!navigator.geolocation) {
-                status.innerHTML = '❌ Геолокация не поддерживается';
-                status.style.color = 'var(--danger)';
+                status.innerHTML = '❌ Нет поддержки GPS';
                 return;
             }
             navigator.geolocation.getCurrentPosition(
                 (pos) => {
-                    status.innerHTML = `✅ Координаты получены. Загружаем время...`;
                     fetchPrayerTimesByCoords(pos.coords.latitude, pos.coords.longitude, 'Ваше местоположение');
                 },
                 (err) => {
-                    let msg = '❌ Ошибка: ';
-                    if (err.code === 1) msg += 'доступ запрещён';
-                    else if (err.code === 2) msg += 'недоступно';
-                    else if (err.code === 3) msg += 'таймаут';
-                    else msg += err.message;
-                    status.innerHTML = msg;
+                    status.innerHTML = '❌ Ошибка GPS';
                     status.style.color = 'var(--danger)';
                 },
-                { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 }
+                { enableHighAccuracy: true, timeout: 10000 }
             );
         }
 
-        // --- Универсальный запрос времени по координатам (method=14, school=0) ---
         async function fetchPrayerTimesByCoords(lat, lon, displayName) {
             try {
                 const date = new Date();
                 const dateStr = `${date.getDate().toString().padStart(2,'0')}-${(date.getMonth()+1).toString().padStart(2,'0')}-${date.getFullYear()}`;
-                // ✅ ЖЁСТКО: method=14, school=0
                 const url = `https://api.aladhan.com/v1/timings/${dateStr}?latitude=${lat}&longitude=${lon}&method=${METHOD}&school=${SCHOOL}`;
                 
                 const res = await fetch(url);
@@ -705,12 +682,10 @@
                     foundTimezone = data.data.meta.timezone;
                     foundCityName = displayName;
 
-                    document.getElementById('cityName').innerHTML = `🕌 ${displayName} (${foundTimezone})`;
+                    document.getElementById('cityName').innerHTML = `🕌 ${displayName}`;
                     document.getElementById('coordsDebug').innerHTML = `
                         📍 ${lat.toFixed(4)}, ${lon.toFixed(4)}<br>
-                        🌍 ${foundTimezone}<br>
-                        📅 ${date.toLocaleDateString('ru-RU')}<br>
-                        🕌 Мазхаб: Шафии | Метод: 14
+                        🌍 ${foundTimezone} | Метод: MWL
                     `;
                     
                     document.getElementById('timeFajr').innerText = data.data.timings.Fajr;
@@ -720,63 +695,24 @@
                     document.getElementById('timeIsha').innerText = data.data.timings.Isha;
                     
                     document.getElementById('prayerTimesCard').style.display = 'block';
-                    document.getElementById('geoStatus').innerHTML = '✅ Время намаза загружено';
+                    document.getElementById('geoStatus').innerHTML = '✅ Обновлено';
                     document.getElementById('geoStatus').style.color = 'var(--success)';
                     
                     saveLocationToStorage(lat, lon, foundTimezone, displayName);
-                    
                     tg.HapticFeedback.notificationOccurred('success');
-                } else {
-                    throw new Error('API error');
                 }
             } catch (e) {
-                console.error(e);
-                document.getElementById('geoStatus').innerHTML = '❌ Ошибка загрузки времени';
-                document.getElementById('geoStatus').style.color = 'var(--danger)';
+                document.getElementById('geoStatus').innerHTML = '❌ Ошибка API';
             }
         }
 
-        // --- ГЕОКОДИНГ С ХАРДКОДОМ ТОЧНЫХ КООРДИНАТ ---
         async function geocodeAndFetchCity() {
             let city = document.getElementById('cityInput').value.trim();
-            if (!city) {
-                tg.showAlert('Введите название города');
-                return;
-            }
+            if (!city) return;
 
             const status = document.getElementById('geoStatus');
-            status.innerHTML = `🔍 Ищем "${city}"...`;
-            status.style.color = 'var(--accent)';
+            status.innerHTML = `🔍 Поиск...`;
             
-            // === ТОЧНЫЕ КООРДИНАТЫ ДЛЯ ИЗВЕСТНЫХ ГОРОДОВ ===
-            const exactCoordinates = {
-                'кусары': { lat: 41.4288, lon: 48.4378, name: 'Кусары' },
-                'qusar': { lat: 41.4288, lon: 48.4378, name: 'Qusar' },
-                'самур': { lat: 41.6325, lon: 48.4302, name: 'Самур' },
-                'samur': { lat: 41.6325, lon: 48.4302, name: 'Samur' },
-                'баку': { lat: 40.4093, lon: 49.8671, name: 'Баку' },
-                'baku': { lat: 40.4093, lon: 49.8671, name: 'Baku' },
-                'махачкала': { lat: 42.9849, lon: 47.5046, name: 'Махачкала' },
-                'makhachkala': { lat: 42.9849, lon: 47.5046, name: 'Makhachkala' },
-                'дербент': { lat: 42.0575, lon: 48.2772, name: 'Дербент' },
-                'derbent': { lat: 42.0575, lon: 48.2772, name: 'Derbent' },
-                'ганжа': { lat: 40.6828, lon: 46.3606, name: 'Гянджа' },
-                'ganja': { lat: 40.6828, lon: 46.3606, name: 'Ganja' },
-                'сумгаит': { lat: 40.5897, lon: 49.6686, name: 'Сумгаит' },
-                'sumgait': { lat: 40.5897, lon: 49.6686, name: 'Sumgait' }
-            };
-
-            const cityLower = city.toLowerCase();
-            
-            // Если город есть в хардкоде — используем точные координаты
-            if (exactCoordinates[cityLower]) {
-                const coords = exactCoordinates[cityLower];
-                status.innerHTML = `✅ Найден: ${coords.name} (точные координаты). Загружаем время...`;
-                await fetchPrayerTimesByCoords(coords.lat, coords.lon, coords.name);
-                return;
-            }
-            
-            // === ОБЫЧНЫЙ ГЕОКОДИНГ ДЛЯ ОСТАЛЬНЫХ ГОРОДОВ ===
             try {
                 const geoRes = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(city)}&limit=1`, {
                     headers: { 'User-Agent': 'MuslimApp-Telegram/1.0' }
@@ -786,26 +722,17 @@
                     const lat = parseFloat(geoData[0].lat);
                     const lon = parseFloat(geoData[0].lon);
                     const name = geoData[0].display_name.split(',')[0];
-                    status.innerHTML = `✅ Найден: ${name}. Загружаем время...`;
                     await fetchPrayerTimesByCoords(lat, lon, name);
                 } else {
-                    status.innerHTML = '❌ Город не найден';
-                    status.style.color = 'var(--danger)';
-                    tg.showAlert('Город не найден');
+                    status.innerHTML = '❌ Не найдено';
                 }
             } catch (e) {
-                console.error('Ошибка геокодинга:', e);
-                status.innerHTML = '❌ Ошибка геокодинга';
-                status.style.color = 'var(--danger)';
+                status.innerHTML = '❌ Ошибка поиска';
             }
         }
 
-        // --- Сохранение в бота ---
         function saveToBot() {
-            if (foundLat === 0) {
-                tg.showAlert('Сначала определите местоположение или город');
-                return;
-            }
+            if (foundLat === 0) return;
             const offset = new Date().getTimezoneOffset();
             tg.sendData(JSON.stringify({
                 action: 'sync_location',
@@ -813,20 +740,19 @@
                 lon: foundLon,
                 offset: offset,
                 timezone: foundTimezone,
-                school: SCHOOL,   // 0 = шафии
-                method: METHOD    // 14 = Россия/Кавказ
+                school: SCHOOL,
+                method: METHOD 
             }));
             tg.close();
         }
 
-        // --- Тасбих ---
         function incrementCounter() {
             counter++;
             localStorage.setItem('tasbihCounter', counter);
             updateCounterDisplay();
             if (counter === target) {
                 tg.HapticFeedback.notificationOccurred('success');
-                tg.showAlert(`🎉 Машаллах! Достигнуто ${target} зикров!`);
+                tg.showAlert(`🎉 Машаллах! Цель достигнута!`);
             } else {
                 tg.HapticFeedback.impactOccurred('light');
             }
@@ -834,18 +760,17 @@
 
         function updateCounterDisplay() {
             document.getElementById('counterDisplay').innerText = counter;
-            document.getElementById('targetInfo').innerText = `Цель: ${target} (осталось: ${Math.max(0, target - counter)})`;
+            document.getElementById('targetInfo').innerText = `Цель: ${target}`;
             document.getElementById('progressFill').style.width = `${Math.min(100, (counter / target) * 100)}%`;
         }
 
         function resetCounter() {
             if (counter > 0) {
-                tg.showConfirm('Сбросить счётчик?', (ok) => {
+                tg.showConfirm('Сбросить?', (ok) => {
                     if (ok) {
                         counter = 0;
                         localStorage.setItem('tasbihCounter', '0');
                         updateCounterDisplay();
-                        tg.HapticFeedback.notificationOccurred('warning');
                     }
                 });
             }
@@ -855,10 +780,8 @@
             target = newTarget;
             localStorage.setItem('tasbihTarget', target);
             updateCounterDisplay();
-            tg.HapticFeedback.impactOccurred('medium');
         }
 
-        // --- Настройки уведомлений ---
         function loadNotificationSettings() {
             const saved = localStorage.getItem('notificationSettings');
             if (saved) {
@@ -881,7 +804,6 @@
             };
             localStorage.setItem('notificationSettings', JSON.stringify(settings));
             tg.sendData(JSON.stringify({ action: 'update_notifications', settings }));
-            tg.HapticFeedback.notificationOccurred('success');
         }
     </script>
 </body>

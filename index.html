@@ -3,90 +3,216 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Muslim App</title>
+    <title>Время Намаза</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        body { font-family: -apple-system, sans-serif; background: #F2F2F7; margin: 0; padding: 20px; text-align: center; }
-        .card { background: white; border-radius: 12px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
-        h1 { margin: 0 0 10px; font-size: 24px; }
-        input { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 8px; font-size: 16px; box-sizing: border-box; }
-        button { width: 100%; padding: 15px; margin-top: 10px; border: none; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer; }
-        .btn-blue { background: #007AFF; color: white; }
-        .btn-green { background: #34C759; color: white; }
-        .info { color: #8E8E93; font-size: 13px; margin-top: 10px; }
-        #coords { font-family: monospace; color: #FF3B30; margin-top: 5px; }
+        :root {
+            --bg-color: #F2F2F7;
+            --card-bg: #FFFFFF;
+            --text-color: #000000;
+            --secondary-text: #8E8E93;
+            --accent: #007AFF;
+            --success: #34C759;
+            --danger: #FF3B30;
+        }
+
+        /* Темная тема автоматически */
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-color: #000000;
+                --card-bg: #1C1C1E;
+                --text-color: #FFFFFF;
+            }
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 400px;
+        }
+
+        h1 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 14px;
+            padding: 16px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            margin-bottom: 16px;
+        }
+
+        input {
+            width: 100%;
+            padding: 14px;
+            font-size: 17px;
+            border: 1px solid #C6C6C8;
+            border-radius: 10px;
+            background: var(--bg-color);
+            color: var(--text-color);
+            outline: none;
+            box-sizing: border-box; /* Важно для отступов */
+            -webkit-appearance: none;
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            font-size: 17px;
+            font-weight: 600;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: opacity 0.2s;
+        }
+
+        button:active { opacity: 0.7; }
+
+        .btn-search { background-color: var(--accent); color: white; }
+        .btn-save { background-color: var(--success); color: white; margin-top: 20px;}
+
+        .result-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(128,128,128,0.2);
+        }
+        .result-row:last-child { border-bottom: none; }
+
+        .label { color: var(--secondary-text); }
+        .value { font-weight: 600; }
+        
+        #coords-debug {
+            font-size: 10px;
+            color: var(--secondary-text);
+            text-align: center;
+            margin-top: 5px;
+            font-family: monospace;
+        }
+
+        /* Анимация загрузки */
+        .loader {
+            border: 3px solid rgba(0,0,0,0.1);
+            border-radius: 50%;
+            border-top: 3px solid var(--accent);
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+            margin: 10px auto;
+            display: none;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
 
-    <div class="card">
-        <h1>🔍 Поиск Города</h1>
-        <p class="info">Введите город (например: Qusar)</p>
-        <input type="text" id="cityInput" placeholder="Baku, Qusar, Moscow...">
-        <button class="btn-blue" onclick="searchCity()">🔎 Найти</button>
-    </div>
+    <div class="container">
+        <h1>Поиск Города</h1>
 
-    <div class="card" id="resultCard" style="display:none;">
-        <h2 id="cityName">Город</h2>
-        <div id="coords">Lat: 0, Lon: 0</div>
-        <hr style="border:0; border-top:1px solid #eee; margin:15px 0;">
-        
-        <div style="display:flex; justify-content:space-between;">
-            <b>Фаджр:</b> <span id="timeFajr">--:--</span>
-        </div>
-        <div style="display:flex; justify-content:space-between;">
-            <b>Зухр:</b> <span id="timeDhuhr">--:--</span>
+        <div class="card">
+            <input type="text" id="cityInput" placeholder="Введите город (Qusar, Baku...)">
+            <button class="btn-search" onclick="searchCity()">Найти</button>
+            <div class="loader" id="loader"></div>
         </div>
 
-        <br>
-        <button class="btn-green" onclick="saveToBot()">📡 СОХРАНИТЬ В БОТА</button>
-        <p class="info">Нажми, чтобы бот запомнил это время!</p>
+        <div class="card" id="resultBlock" style="display: none;">
+            <div style="text-align: center; font-size: 20px; font-weight: bold; margin-bottom: 10px;" id="cityName">
+                CITY
+            </div>
+            
+            <div class="result-row">
+                <span class="label">Фаджр</span>
+                <span class="value" id="fajrTime">--:--</span>
+            </div>
+            <div class="result-row">
+                <span class="label">Зухр</span>
+                <span class="value" id="dhuhrTime">--:--</span>
+            </div>
+            <div class="result-row">
+                <span class="label">Магриб</span>
+                <span class="value" id="maghribTime">--:--</span>
+            </div>
+
+            <div id="coords-debug">GPS: 0.00, 0.00</div>
+
+            <button class="btn-save" onclick="saveData()">📡 СОХРАНИТЬ В БОТА</button>
+        </div>
     </div>
 
     <script>
         const tg = window.Telegram.WebApp;
         tg.expand();
-        
-        // Глобальные переменные для хранения координат
-        let currentLat = 0;
-        let currentLon = 0;
+
+        let foundLat = 0;
+        let foundLon = 0;
 
         function searchCity() {
-            let city = document.getElementById('cityInput').value;
-            if(!city) return alert("Введите название города!");
+            const city = document.getElementById('cityInput').value.trim();
+            if (!city) return tg.showAlert("Введите название города!");
 
+            document.getElementById('loader').style.display = 'block';
+            document.getElementById('resultBlock').style.display = 'none';
+
+            // Используем Method 14 (Russia/Caucasus) для правильного времени
             fetch(`https://api.aladhan.com/v1/timingsByCity?city=${city}&country=&method=14`)
-                .then(res => res.json())
+                .then(response => response.json())
                 .then(data => {
-                    if(data.code === 200) {
-                        // 1. ЗАПОМИНАЕМ КООРДИНАТЫ
-                        currentLat = data.data.meta.latitude;
-                        currentLon = data.data.meta.longitude;
+                    document.getElementById('loader').style.display = 'none';
+                    
+                    if (data.code === 200) {
+                        const timings = data.data.timings;
+                        const meta = data.data.meta;
 
-                        // 2. ПОКАЗЫВАЕМ НА ЭКРАНЕ (ДЛЯ ПРОВЕРКИ)
+                        foundLat = meta.latitude;
+                        foundLon = meta.longitude;
+
                         document.getElementById('cityName').innerText = city.toUpperCase();
-                        document.getElementById('coords').innerText = `Lat: ${currentLat}, Lon: ${currentLon}`;
-                        document.getElementById('timeFajr').innerText = data.data.timings.Fajr;
-                        document.getElementById('timeDhuhr').innerText = data.data.timings.Dhuhr;
+                        document.getElementById('fajrTime').innerText = timings.Fajr;
+                        document.getElementById('dhuhrTime').innerText = timings.Dhuhr;
+                        document.getElementById('maghribTime').innerText = timings.Maghrib;
                         
-                        document.getElementById('resultCard').style.display = 'block';
+                        // Показываем реальные координаты, чтобы ты видел, что это НЕ 8.888
+                        document.getElementById('coords-debug').innerText = `GPS: ${foundLat}, ${foundLon}`;
+
+                        document.getElementById('resultBlock').style.display = 'block';
                     } else {
-                        alert("Город не найден! Попробуй написать по-английски (Qusar, Gusar).");
+                        tg.showAlert("Город не найден. Попробуйте написать английскими буквами (Qusar).");
                     }
                 })
-                .catch(e => alert("Ошибка интернета: " + e));
+                .catch(error => {
+                    document.getElementById('loader').style.display = 'none';
+                    tg.showAlert("Ошибка соединения. Проверьте интернет.");
+                });
         }
 
-        function saveToBot() {
-            if(currentLat === 0) return alert("Сначала найди город!");
-            
-            // Отправляем РЕАЛЬНЫЕ координаты
-            tg.sendData(JSON.stringify({
+        function saveData() {
+            if (foundLat === 0) return tg.showAlert("Сначала найдите город!");
+
+            const dataToSend = {
                 action: 'sync_location',
-                lat: currentLat,
-                lon: currentLon,
+                lat: foundLat,
+                lon: foundLon,
                 offset: new Date().getTimezoneOffset()
-            }));
+            };
+
+            tg.sendData(JSON.stringify(dataToSend));
+            tg.close();
         }
     </script>
 </body>

@@ -14,7 +14,6 @@
             padding-bottom: 80px;
         }
         
-        /* Табы навигации */
         .tabs {
             position: fixed;
             top: 0;
@@ -41,7 +40,6 @@
             font-weight: bold;
         }
         
-        /* Контент страниц */
         .content {
             margin-top: 60px;
             padding: 20px;
@@ -58,7 +56,6 @@
             to { opacity: 1; transform: translateY(0); }
         }
         
-        /* Карточки */
         .card {
             background: white;
             border-radius: 16px;
@@ -72,7 +69,6 @@
             font-size: 20px;
         }
         
-        /* Время намаза */
         .prayer-time {
             display: flex;
             justify-content: space-between;
@@ -97,7 +93,6 @@
             margin-right: 10px;
         }
         
-        /* Поиск города */
         input[type="text"] {
             width: 100%;
             padding: 15px;
@@ -112,7 +107,6 @@
             border-color: #667eea;
         }
         
-        /* Кнопки */
         button {
             width: 100%;
             padding: 16px;
@@ -136,7 +130,6 @@
             color: white;
         }
         
-        /* Тасбих */
         .tasbih-container {
             text-align: center;
         }
@@ -199,7 +192,6 @@
             border-radius: 10px;
         }
         
-        /* Настройки */
         .setting-item {
             display: flex;
             justify-content: space-between;
@@ -286,17 +278,14 @@
     </style>
 </head>
 <body>
-    <!-- Навигация -->
     <div class="tabs">
-        <div class="tab active" onclick="switchTab('prayer')">🕌 Намаз</div>
-        <div class="tab" onclick="switchTab('tasbih')">📿 Тасбих</div>
-        <div class="tab" onclick="switchTab('settings')">⚙️ Настройки</div>
+        <div class="tab active" onclick="switchTab(event, 'prayer')">🕌 Намаз</div>
+        <div class="tab" onclick="switchTab(event, 'tasbih')">📿 Тасбих</div>
+        <div class="tab" onclick="switchTab(event, 'settings')">⚙️ Настройки</div>
     </div>
 
     <div class="content">
-        <!-- Страница: Время намаза -->
         <div id="prayer" class="page active">
-            <!-- Текущее время -->
             <div class="card">
                 <h2>🕐 Текущее время</h2>
                 <div class="current-time" id="currentTime">--:--:--</div>
@@ -317,7 +306,7 @@
                 <div class="debug-info" id="coordsDebug"></div>
                 
                 <div class="warning">
-                    ⚠️ Время намаза показано для вашего города. Убедитесь, что ваше текущее время совпадает с часами!
+                    ⚠️ Время намаза показано для вашего города. Убедитесь, что время совпадает с поясом города!
                 </div>
                 
                 <div style="margin: 20px 0;">
@@ -363,7 +352,6 @@
             </div>
         </div>
 
-        <!-- Страница: Тасбих -->
         <div id="tasbih" class="page">
             <div class="card tasbih-container">
                 <h2>📿 Тасбих</h2>
@@ -405,7 +393,6 @@
             </div>
         </div>
 
-        <!-- Страница: Настройки -->
         <div id="settings" class="page">
             <div class="card">
                 <h2>🔔 Уведомления</h2>
@@ -454,7 +441,7 @@
                     Muslim App - приложение для мусульман с точным расчетом времени намаза по методу 14 (Россия/Кавказ).
                 </p>
                 <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #f0f0f0; font-size: 13px; color: #999;">
-                    Версия 2.1 (исправлена)<br>
+                    Версия 3.0 (исправлена)<br>
                     © 2025 Muslim App
                 </div>
             </div>
@@ -468,16 +455,24 @@
         
         let foundLat = 0;
         let foundLon = 0;
+        let foundTimezone = ''; // Новое поле для часового пояса города
+        
         let counter = parseInt(localStorage.getItem('tasbihCounter') || '0');
         let target = parseInt(localStorage.getItem('tasbihTarget') || '33');
 
-        // Инициализация
         updateCounterDisplay();
         loadNotificationSettings();
         updateCurrentTime();
-        
-        // Обновление текущего времени каждую секунду
         setInterval(updateCurrentTime, 1000);
+
+        // Переключение вкладок с передачей события
+        function switchTab(event, tabName) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            
+            event.target.classList.add('active');
+            document.getElementById(tabName).classList.add('active');
+        }
 
         function updateCurrentTime() {
             const now = new Date();
@@ -495,16 +490,6 @@
             document.getElementById('offsetInfo').textContent = offset;
         }
 
-        // Переключение вкладок
-        function switchTab(tabName) {
-            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            
-            event.target.classList.add('active');
-            document.getElementById(tabName).classList.add('active');
-        }
-
-        // Поиск города
         function searchCity() {
             let city = document.getElementById('cityInput').value.trim();
             if(!city) {
@@ -517,18 +502,19 @@
                 message: 'Ищем время намаза для ' + city
             });
             
-            // Используем Method 14 (Russia/Caucasus)
             fetch(`https://api.aladhan.com/v1/timingsByCity?city=${city}&country=&method=14&school=1`)
                 .then(res => res.json())
                 .then(data => {
                     if(data.code === 200) {
                         foundLat = data.data.meta.latitude;
                         foundLon = data.data.meta.longitude;
+                        foundTimezone = data.data.meta.timezone; // Сохраняем часовой пояс
                         
                         document.getElementById('cityName').innerText = '🕌 ' + city.toUpperCase();
                         
                         const debugInfo = `
                             📍 Координаты: ${foundLat}, ${foundLon}<br>
+                            🌍 Часовой пояс: ${foundTimezone}<br>
                             🌍 Метод расчета: Russia/Caucasus (14)<br>
                             📅 Дата: ${new Date().toLocaleDateString('ru-RU')}
                         `;
@@ -544,9 +530,9 @@
                         
                         console.log('Найдено время намаза:', data.data.timings);
                         console.log('Координаты:', foundLat, foundLon);
-                        console.log('Offset:', new Date().getTimezoneOffset());
+                        console.log('Часовой пояс:', foundTimezone);
                         
-                        tg.showAlert('✅ Время намаза найдено! Проверьте, совпадает ли ваше текущее время с часами.');
+                        tg.showAlert('✅ Время намаза найдено! Проверьте часовой пояс города.');
                     } else {
                         tg.showAlert('❌ Город не найден! Попробуйте: Qusar, Baku, Ganja, Makhachkala, Derbent');
                     }
@@ -557,7 +543,6 @@
                 });
         }
 
-        // Сохранить в бота
         function saveToBot() {
             if(foundLat === 0) {
                 tg.showAlert('Сначала найдите город!');
@@ -570,18 +555,17 @@
                 action: 'sync_location',
                 lat: foundLat,
                 lon: foundLon,
-                offset: offset
+                offset: offset,
+                timezone: foundTimezone   // Передаём часовой пояс
             };
             
             console.log('Отправка данных боту:', dataToSend);
             
             tg.sendData(JSON.stringify(dataToSend));
             
-            // Показываем сообщение перед закрытием
             setTimeout(() => tg.close(), 500);
         }
 
-        // Тасбих
         function incrementCounter() {
             counter++;
             localStorage.setItem('tasbihCounter', counter);
@@ -625,7 +609,6 @@
             tg.HapticFeedback.impactOccurred('medium');
         }
 
-        // Настройки уведомлений
         function loadNotificationSettings() {
             let saved = localStorage.getItem('notificationSettings');
             if(saved) {

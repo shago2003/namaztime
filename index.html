@@ -6,379 +6,88 @@
     <title>Muslim App</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        :root {
-            --bg-color: #F2F2F7;
-            --card-bg: #FFFFFF;
-            --text-color: #000000;
-            --secondary-text: #8E8E93;
-            --accent-color: #007AFF;
-            --success-color: #34C759;
-            --danger-color: #FF3B30;
-            --border-color: #C6C6C8;
-            --tab-bar-bg: #F9F9F9;
-        }
-
-        [data-theme="dark"] {
-            --bg-color: #000000;
-            --card-bg: #1C1C1E;
-            --text-color: #FFFFFF;
-            --secondary-text: #8E8E93;
-            --accent-color: #0A84FF;
-            --border-color: #38383A;
-            --tab-bar-bg: #1C1C1E;
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            margin: 0; padding: 0; padding-bottom: 90px;
-            overflow-x: hidden; -webkit-tap-highlight-color: transparent;
-            user-select: none;
-        }
-
-        /* --- КОНТЕЙНЕРЫ --- */
-        .container { display: none; padding: 20px; animation: fadeIn 0.3s ease; }
-        .container.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
-        h1 { font-size: 34px; font-weight: 700; margin: 10px 0 20px 0; letter-spacing: -0.5px; }
-        h2 { font-size: 13px; text-transform: uppercase; color: var(--secondary-text); margin: 20px 0 8px 15px; }
-
-        /* --- КАРТОЧКИ --- */
-        .card {
-            background: var(--card-bg);
-            border-radius: 12px;
-            overflow: hidden;
-            margin-bottom: 20px;
-        }
-        
-        .list-item {
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 16px;
-            border-bottom: 0.5px solid var(--border-color);
-            background: var(--card-bg);
-        }
-        .list-item:last-child { border-bottom: none; }
-
-        /* ИНПУТЫ И КНОПКИ */
-        .ios-input {
-            border: none; background: transparent; font-size: 17px;
-            color: var(--text-color); width: 100%; outline: none;
-        }
-        .search-btn {
-            background: var(--accent-color); color: white; border: none;
-            border-radius: 6px; padding: 6px 12px; font-size: 14px; font-weight: 600; cursor: pointer;
-        }
-
-        /* --- ГЛАВНЫЙ ЭКРАН --- */
-        .hero-card {
-            background: linear-gradient(135deg, #007AFF, #5AC8FA);
-            color: white; padding: 30px 20px; border-radius: 20px;
-            text-align: center; box-shadow: 0 10px 20px rgba(0,122,255, 0.3);
-            margin-bottom: 25px;
-        }
-        .hero-time { font-size: 60px; font-weight: 700; letter-spacing: -2px; line-height: 1; margin: 10px 0; }
-        .hero-label { font-size: 18px; font-weight: 500; opacity: 0.9; }
-        .hero-location { font-size: 14px; opacity: 0.7; margin-top: 5px; display: flex; align-items: center; justify-content: center; gap: 5px;}
-
-        /* --- ТАСБИХ --- */
-        .tasbih-circle {
-            width: 250px; height: 250px; border-radius: 50%;
-            background: var(--card-bg); border: 1px solid var(--border-color);
-            display: flex; align-items: center; justify-content: center; flex-direction: column;
-            margin: 40px auto; box-shadow: 0 10px 30px rgba(0,0,0,0.05);
-            transition: transform 0.1s; cursor: pointer;
-        }
-        .tasbih-circle:active { transform: scale(0.95); background: var(--bg-color); }
-        .count-text { font-size: 80px; font-weight: 700; font-variant-numeric: tabular-nums; }
-
-        /* --- ПЕРЕКЛЮЧАТЕЛЬ --- */
-        .switch { position: relative; display: inline-block; width: 51px; height: 31px; }
-        .switch input { opacity: 0; width: 0; height: 0; }
-        .slider {
-            position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
-            background-color: #E9E9EA; transition: .4s; border-radius: 34px;
-        }
-        .slider:before {
-            position: absolute; content: ""; height: 27px; width: 27px;
-            left: 2px; bottom: 2px; background-color: white; transition: .4s; border-radius: 50%; box-shadow: 0 3px 8px rgba(0,0,0,0.15);
-        }
-        input:checked + .slider { background-color: var(--success-color); }
-        input:checked + .slider:before { transform: translateX(20px); }
-        [data-theme="dark"] .slider { background-color: #39393D; }
-
-        /* --- НИЖНЕЕ МЕНЮ --- */
-        .tab-bar {
-            position: fixed; bottom: 0; left: 0; width: 100%;
-            background: var(--tab-bar-bg);
-            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-            border-top: 0.5px solid var(--border-color);
-            display: flex; justify-content: space-around;
-            padding-bottom: env(safe-area-inset-bottom);
-            height: 55px; z-index: 1000;
-        }
-        .tab-btn {
-            background: none; border: none; flex: 1;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            color: var(--secondary-text); font-size: 10px; font-weight: 500;
-        }
-        .tab-btn.active { color: var(--accent-color); }
-        .tab-icon { font-size: 24px; margin-bottom: 3px; }
-        
-        .btn-text { color: var(--accent-color); font-size: 17px; background: none; border: none; cursor: pointer; }
-        .btn-danger { color: var(--danger-color); }
+        body { font-family: -apple-system, sans-serif; background: #F2F2F7; margin: 0; padding: 20px; text-align: center; }
+        .card { background: white; border-radius: 12px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        h1 { margin: 0 0 10px; font-size: 24px; }
+        input { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 8px; font-size: 16px; box-sizing: border-box; }
+        button { width: 100%; padding: 15px; margin-top: 10px; border: none; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer; }
+        .btn-blue { background: #007AFF; color: white; }
+        .btn-green { background: #34C759; color: white; }
+        .info { color: #8E8E93; font-size: 13px; margin-top: 10px; }
+        #coords { font-family: monospace; color: #FF3B30; margin-top: 5px; }
     </style>
 </head>
 <body>
 
-    <div id="tab-home" class="container active">
-        <h1>Обзор</h1>
-        <div class="hero-card">
-            <div class="hero-label">Следующий намаз</div>
-            <div class="hero-time" id="nextTime">--:--</div>
-            <div class="hero-label" id="nextName">Загрузка...</div>
-            <div class="hero-location" id="locationBadge">📍 ...</div>
-        </div>
-
-        <h2>РАСПИСАНИЕ</h2>
-        <div class="card" id="scheduleList"></div>
+    <div class="card">
+        <h1>🔍 Поиск Города</h1>
+        <p class="info">Введите город (например: Qusar)</p>
+        <input type="text" id="cityInput" placeholder="Baku, Qusar, Moscow...">
+        <button class="btn-blue" onclick="searchCity()">🔎 Найти</button>
     </div>
 
-    <div id="tab-tasbih" class="container">
-        <h1>Тасбих</h1>
-        <div class="tasbih-circle" onclick="countTasbih()">
-            <div class="count-text" id="tasbihCount">0</div>
-            <div style="color: var(--secondary-text); margin-top: 10px;">Нажать</div>
+    <div class="card" id="resultCard" style="display:none;">
+        <h2 id="cityName">Город</h2>
+        <div id="coords">Lat: 0, Lon: 0</div>
+        <hr style="border:0; border-top:1px solid #eee; margin:15px 0;">
+        
+        <div style="display:flex; justify-content:space-between;">
+            <b>Фаджр:</b> <span id="timeFajr">--:--</span>
         </div>
-        <div style="text-align: center;">
-            <button class="btn-text btn-danger" onclick="resetTasbih()">Сбросить счетчик</button>
-        </div>
-    </div>
-
-    <div id="tab-settings" class="container">
-        <h1>Настройки</h1>
-
-        <h2>ОСНОВНЫЕ</h2>
-        <div class="card">
-            <div class="list-item">
-                <span>Темная тема</span>
-                <label class="switch">
-                    <input type="checkbox" id="themeToggle" onchange="toggleTheme()">
-                    <span class="slider"></span>
-                </label>
-            </div>
-            <div class="list-item">
-                <span>Уведомления (Вкл/Выкл)</span>
-                <label class="switch">
-                    <input type="checkbox" id="notifToggle" onchange="toggleNotifications()">
-                    <span class="slider"></span>
-                </label>
-            </div>
+        <div style="display:flex; justify-content:space-between;">
+            <b>Зухр:</b> <span id="timeDhuhr">--:--</span>
         </div>
 
-        <h2>ЛОКАЦИЯ</h2>
-        <div class="card">
-            <div class="list-item">
-                <input type="text" id="cityInput" class="ios-input" placeholder="Введите город (напр. Baku)">
-                <button class="search-btn" onclick="searchCity(null, false)">Найти</button>
-            </div>
-            <div class="list-item" onclick="getLocation(false)" style="cursor: pointer;">
-                <span style="color: var(--accent-color); display:flex; align-items:center;">
-                    <span style="font-size:20px; margin-right:8px;">📍</span> 
-                    Обновить GPS
-                </span>
-            </div>
-            <div class="list-item">
-                <span style="color: var(--secondary-text); font-size:14px;">Выбран:</span>
-                <span id="currentCityName" style="font-weight:600;">Не выбран</span>
-            </div>
-        </div>
-
-        <h2>СИНХРОНИЗАЦИЯ</h2>
-        <p style="text-align:center; color:gray; font-size:13px; margin-bottom:15px;">
-            Если бот не присылает уведомления, нажмите кнопку ниже:
-        </p>
-        <div class="card">
-            <div class="list-item" onclick="manualSync()" style="cursor: pointer;">
-                <span style="color: var(--success-color); font-weight:600;">📡 Отправить настройки Боту</span>
-            </div>
-        </div>
-
-    </div>
-
-    <div class="tab-bar">
-        <button class="tab-btn active" onclick="switchTab('home', this)">
-            <div class="tab-icon">🏠</div>Главная
-        </button>
-        <button class="tab-btn" onclick="switchTab('tasbih', this)">
-            <div class="tab-icon">📿</div>Тасбих
-        </button>
-        <button class="tab-btn" onclick="switchTab('settings', this)">
-            <div class="tab-icon">⚙️</div>Настройки
-        </button>
+        <br>
+        <button class="btn-green" onclick="saveToBot()">📡 СОХРАНИТЬ В БОТА</button>
+        <p class="info">Нажми, чтобы бот запомнил это время!</p>
     </div>
 
     <script>
         const tg = window.Telegram.WebApp;
         tg.expand();
         
-        let tasbih = parseInt(localStorage.getItem('tasbih')) || 0;
-        let isDark = localStorage.getItem('theme') === 'dark';
-        let notifEnabled = localStorage.getItem('notifEnabled') === 'true';
-        let currentLat = 0, currentLon = 0;
+        // Глобальные переменные для хранения координат
+        let currentLat = 0;
+        let currentLon = 0;
 
-        function init() {
-            if(isDark) document.body.setAttribute('data-theme', 'dark');
-            document.getElementById('themeToggle').checked = isDark;
-            document.getElementById('notifToggle').checked = notifEnabled;
-            document.getElementById('tasbihCount').innerText = tasbih;
+        function searchCity() {
+            let city = document.getElementById('cityInput').value;
+            if(!city) return alert("Введите название города!");
 
-            const savedCity = localStorage.getItem('savedCity');
-            if (savedCity) {
-                document.getElementById('cityInput').value = savedCity;
-                searchCity(savedCity, false);
-            } else {
-                getLocation(false);
-            }
-        }
-
-        // --- ЛОГИКА БЕЗ АВТО-ЗАКРЫТИЯ ---
-        
-        function getLocation(notifyUser = false) {
-            if(notifyUser) document.getElementById('locationBadge').innerText = "⏳...";
-            
-            navigator.geolocation.getCurrentPosition(
-                pos => {
-                    currentLat = pos.coords.latitude;
-                    currentLon = pos.coords.longitude;
-                    localStorage.removeItem('savedCity');
-                    document.getElementById('cityInput').value = ""; 
-                    loadTimingsByCoords(currentLat, currentLon);
-                },
-                err => {
-                    if(notifyUser) alert("GPS недоступен");
-                    loadTimingsByCoords(40.4093, 49.8671); // Default Baku
-                }
-            );
-        }
-
-        function searchCity(cityOverride, notifyUser = false) {
-            let city = cityOverride || document.getElementById('cityInput').value;
-            if(!city) return;
-
-            fetch(`https://api.aladhan.com/v1/timingsByCity?city=${city}&country=&method=3`)
+            fetch(`https://api.aladhan.com/v1/timingsByCity?city=${city}&country=&method=14`)
                 .then(res => res.json())
                 .then(data => {
                     if(data.code === 200) {
+                        // 1. ЗАПОМИНАЕМ КООРДИНАТЫ
                         currentLat = data.data.meta.latitude;
                         currentLon = data.data.meta.longitude;
-                        localStorage.setItem('savedCity', city);
-                        renderTimings(data.data.timings);
-                        document.getElementById('currentCityName').innerText = city;
-                        document.getElementById('locationBadge').innerText = "📍 " + city;
-                    } else if(notifyUser) {
-                        alert("Город не найден!");
+
+                        // 2. ПОКАЗЫВАЕМ НА ЭКРАНЕ (ДЛЯ ПРОВЕРКИ)
+                        document.getElementById('cityName').innerText = city.toUpperCase();
+                        document.getElementById('coords').innerText = `Lat: ${currentLat}, Lon: ${currentLon}`;
+                        document.getElementById('timeFajr').innerText = data.data.timings.Fajr;
+                        document.getElementById('timeDhuhr').innerText = data.data.timings.Dhuhr;
+                        
+                        document.getElementById('resultCard').style.display = 'block';
+                    } else {
+                        alert("Город не найден! Попробуй написать по-английски (Qusar, Gusar).");
                     }
-                });
+                })
+                .catch(e => alert("Ошибка интернета: " + e));
         }
 
-        function loadTimingsByCoords(lat, lon) {
-            const date = Math.floor(Date.now() / 1000);
-            fetch(`https://api.aladhan.com/v1/timings/${date}?latitude=${lat}&longitude=${lon}&method=3`)
-                .then(res => res.json())
-                .then(data => {
-                    renderTimings(data.data.timings);
-                    document.getElementById('currentCityName').innerText = "GPS";
-                    document.getElementById('locationBadge').innerText = "📍 Моя локация";
-                });
-        }
-
-        // --- ТОЛЬКО ЗДЕСЬ ОТПРАВЛЯЕМ ДАННЫЕ И ЗАКРЫВАЕМ ---
-        function sendDataToBot() {
-            if (currentLat === 0) return alert("Сначала найдите город!");
-            const offset = new Date().getTimezoneOffset();
+        function saveToBot() {
+            if(currentLat === 0) return alert("Сначала найди город!");
             
-            tg.sendData(JSON.stringify({ 
-                action: 'sync_location', 
-                lat: currentLat, 
-                lon: currentLon, 
-                offset: offset 
+            // Отправляем РЕАЛЬНЫЕ координаты
+            tg.sendData(JSON.stringify({
+                action: 'sync_location',
+                lat: currentLat,
+                lon: currentLon,
+                offset: new Date().getTimezoneOffset()
             }));
         }
-
-        // Переключатель уведомлений
-        function toggleNotifications() {
-            notifEnabled = document.getElementById('notifToggle').checked;
-            localStorage.setItem('notifEnabled', notifEnabled);
-            
-            if (notifEnabled) {
-                // Если включили - предлагаем сохранить в бота
-                if(confirm("Включить уведомления в Боте? Приложение закроется для сохранения.")) {
-                    sendDataToBot();
-                }
-            } else {
-                alert("Уведомления отключены (локально).");
-            }
-        }
-
-        // Ручная кнопка "Отправить"
-        function manualSync() {
-            if(confirm("Сохранить настройки в Бота?")) {
-                sendDataToBot();
-            }
-        }
-
-        // --- ВИЗУАЛ ---
-        function renderTimings(timings) {
-            const list = document.getElementById('scheduleList');
-            list.innerHTML = "";
-            const names = {Fajr:"Фаджр", Sunrise:"Восход", Dhuhr:"Зухр", Asr:"Аср", Maghrib:"Магриб", Isha:"Иша"};
-            const now = new Date();
-            const nowMins = now.getHours() * 60 + now.getMinutes();
-            let nextFound = false;
-
-            for (let key in names) {
-                const time = timings[key];
-                list.innerHTML += `
-                    <div class="list-item">
-                        <span style="font-weight:500;">${names[key]}</span>
-                        <span style="font-weight:600; color:var(--accent-color); font-size:17px;">${time}</span>
-                    </div>
-                `;
-                const [h, m] = time.split(':').map(Number);
-                if (!nextFound && (h*60+m) > nowMins) {
-                    document.getElementById('nextTime').innerText = time;
-                    document.getElementById('nextName').innerText = names[key];
-                    nextFound = true;
-                }
-            }
-            if(!nextFound) {
-                document.getElementById('nextTime').innerText = timings['Fajr'];
-                document.getElementById('nextName').innerText = "Фаджр (Завтра)";
-            }
-        }
-
-        function toggleTheme() {
-            isDark = !isDark;
-            document.body.setAttribute('data-theme', isDark ? 'dark' : 'light');
-            localStorage.setItem('theme', isDark ? 'dark' : 'light');
-            if(tg.HapticFeedback) tg.HapticFeedback.selectionChanged();
-        }
-        function countTasbih() {
-            tasbih++; document.getElementById('tasbihCount').innerText = tasbih;
-            localStorage.setItem('tasbih', tasbih);
-            if(tg.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
-        }
-        function resetTasbih() { tasbih=0; document.getElementById('tasbihCount').innerText=0; localStorage.setItem('tasbih',0); }
-        function switchTab(name, btn) {
-            document.querySelectorAll('.container').forEach(el => el.classList.remove('active'));
-            document.getElementById('tab-'+name).classList.add('active');
-            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
-            btn.classList.add('active');
-        }
-
-        init();
     </script>
 </body>
 </html>

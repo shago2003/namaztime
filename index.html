@@ -3,216 +3,594 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Время Намаза</title>
+    <title>Muslim App</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        :root {
-            --bg-color: #F2F2F7;
-            --card-bg: #FFFFFF;
-            --text-color: #000000;
-            --secondary-text: #8E8E93;
-            --accent: #007AFF;
-            --success: #34C759;
-            --danger: #FF3B30;
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding-bottom: 80px;
         }
-
-        /* Темная тема автоматически */
-        @media (prefers-color-scheme: dark) {
-            :root {
-                --bg-color: #000000;
-                --card-bg: #1C1C1E;
-                --text-color: #FFFFFF;
-            }
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            height: 100vh;
-        }
-
-        .container {
-            width: 100%;
-            max-width: 400px;
-        }
-
-        h1 {
-            font-size: 28px;
-            font-weight: 700;
-            margin-bottom: 20px;
-            text-align: center;
-        }
-
-        .card {
-            background: var(--card-bg);
-            border-radius: 14px;
-            padding: 16px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-            margin-bottom: 16px;
-        }
-
-        input {
-            width: 100%;
-            padding: 14px;
-            font-size: 17px;
-            border: 1px solid #C6C6C8;
-            border-radius: 10px;
-            background: var(--bg-color);
-            color: var(--text-color);
-            outline: none;
-            box-sizing: border-box; /* Важно для отступов */
-            -webkit-appearance: none;
-        }
-
-        button {
-            width: 100%;
-            padding: 14px;
-            font-size: 17px;
-            font-weight: 600;
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-            margin-top: 10px;
-            transition: opacity 0.2s;
-        }
-
-        button:active { opacity: 0.7; }
-
-        .btn-search { background-color: var(--accent); color: white; }
-        .btn-save { background-color: var(--success); color: white; margin-top: 20px;}
-
-        .result-row {
-            display: flex;
-            justify-content: space-between;
-            padding: 12px 0;
-            border-bottom: 1px solid rgba(128,128,128,0.2);
-        }
-        .result-row:last-child { border-bottom: none; }
-
-        .label { color: var(--secondary-text); }
-        .value { font-weight: 600; }
         
-        #coords-debug {
-            font-size: 10px;
-            color: var(--secondary-text);
-            text-align: center;
-            margin-top: 5px;
-            font-family: monospace;
+        /* Табы навигации */
+        .tabs {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            display: flex;
+            justify-content: space-around;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            z-index: 100;
         }
-
-        /* Анимация загрузки */
-        .loader {
-            border: 3px solid rgba(0,0,0,0.1);
-            border-radius: 50%;
-            border-top: 3px solid var(--accent);
-            width: 20px;
-            height: 20px;
-            animation: spin 1s linear infinite;
-            margin: 10px auto;
+        .tab {
+            flex: 1;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+            font-size: 14px;
+        }
+        .tab.active {
+            border-bottom-color: #667eea;
+            color: #667eea;
+            font-weight: bold;
+        }
+        
+        /* Контент страниц */
+        .content {
+            margin-top: 60px;
+            padding: 20px;
+        }
+        .page {
             display: none;
         }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .page.active {
+            display: block;
+            animation: fadeIn 0.3s;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Карточки */
+        .card {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        .card h2 {
+            margin-bottom: 15px;
+            color: #333;
+            font-size: 20px;
+        }
+        
+        /* Время намаза */
+        .prayer-time {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .prayer-time:last-child {
+            border-bottom: none;
+        }
+        .prayer-name {
+            font-size: 16px;
+            color: #555;
+        }
+        .prayer-time-value {
+            font-size: 18px;
+            font-weight: bold;
+            color: #667eea;
+        }
+        .prayer-emoji {
+            font-size: 24px;
+            margin-right: 10px;
+        }
+        
+        /* Поиск города */
+        input[type="text"] {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            font-size: 16px;
+            margin-bottom: 10px;
+            transition: border 0.3s;
+        }
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        /* Кнопки */
+        button {
+            width: 100%;
+            padding: 16px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 10px;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .btn-primary:active {
+            transform: scale(0.98);
+        }
+        .btn-success {
+            background: linear-gradient(135deg, #34C759 0%, #28a745 100%);
+            color: white;
+        }
+        
+        /* Тасбих */
+        .tasbih-container {
+            text-align: center;
+        }
+        .counter-display {
+            font-size: 72px;
+            font-weight: bold;
+            color: #667eea;
+            margin: 30px 0;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+        .counter-button {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            font-size: 24px;
+            border: none;
+            cursor: pointer;
+            margin: 20px auto;
+            display: block;
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+            transition: all 0.2s;
+        }
+        .counter-button:active {
+            transform: scale(0.95);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+        .tasbih-controls {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .tasbih-controls button {
+            flex: 1;
+            padding: 12px;
+            font-size: 14px;
+        }
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #333;
+        }
+        .target-info {
+            font-size: 14px;
+            color: #666;
+            margin-top: 10px;
+        }
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #f0f0f0;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            transition: width 0.3s;
+            border-radius: 10px;
+        }
+        
+        /* Настройки */
+        .setting-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .setting-item:last-child {
+            border-bottom: none;
+        }
+        .switch {
+            position: relative;
+            width: 50px;
+            height: 28px;
+        }
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 28px;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 20px;
+            width: 20px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        input:checked + .slider {
+            background-color: #667eea;
+        }
+        input:checked + .slider:before {
+            transform: translateX(22px);
+        }
+        
+        .info {
+            color: #999;
+            font-size: 13px;
+            margin-top: 10px;
+            text-align: center;
+        }
+        
+        .coords-debug {
+            font-size: 11px;
+            color: #999;
+            margin-top: 5px;
+            text-align: center;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #666;
+        }
+        .empty-state-icon {
+            font-size: 64px;
+            margin-bottom: 15px;
+        }
     </style>
 </head>
 <body>
+    <!-- Навигация -->
+    <div class="tabs">
+        <div class="tab active" onclick="switchTab('prayer')">🕌 Намаз</div>
+        <div class="tab" onclick="switchTab('tasbih')">📿 Тасбих</div>
+        <div class="tab" onclick="switchTab('settings')">⚙️ Настройки</div>
+    </div>
 
-    <div class="container">
-        <h1>Поиск Города</h1>
+    <div class="content">
+        <!-- Страница: Время намаза -->
+        <div id="prayer" class="page active">
+            <div class="card">
+                <h2>🔍 Поиск города</h2>
+                <input type="text" id="cityInput" placeholder="Введите город (например: Qusar)">
+                <button class="btn-primary" onclick="searchCity()">Найти город</button>
+            </div>
 
-        <div class="card">
-            <input type="text" id="cityInput" placeholder="Введите город (Qusar, Baku...)">
-            <button class="btn-search" onclick="searchCity()">Найти</button>
-            <div class="loader" id="loader"></div>
+            <div class="card" id="prayerTimesCard" style="display:none;">
+                <h2 id="cityName">Время намаза</h2>
+                <div class="coords-debug" id="coordsDebug"></div>
+                
+                <div style="margin: 20px 0;">
+                    <div class="prayer-time">
+                        <div>
+                            <span class="prayer-emoji">🌅</span>
+                            <span class="prayer-name">Фаджр</span>
+                        </div>
+                        <span class="prayer-time-value" id="timeFajr">--:--</span>
+                    </div>
+                    <div class="prayer-time">
+                        <div>
+                            <span class="prayer-emoji">☀️</span>
+                            <span class="prayer-name">Зухр</span>
+                        </div>
+                        <span class="prayer-time-value" id="timeDhuhr">--:--</span>
+                    </div>
+                    <div class="prayer-time">
+                        <div>
+                            <span class="prayer-emoji">🌤</span>
+                            <span class="prayer-name">Аср</span>
+                        </div>
+                        <span class="prayer-time-value" id="timeAsr">--:--</span>
+                    </div>
+                    <div class="prayer-time">
+                        <div>
+                            <span class="prayer-emoji">🌇</span>
+                            <span class="prayer-name">Магриб</span>
+                        </div>
+                        <span class="prayer-time-value" id="timeMaghrib">--:--</span>
+                    </div>
+                    <div class="prayer-time">
+                        <div>
+                            <span class="prayer-emoji">🌙</span>
+                            <span class="prayer-name">Иша</span>
+                        </div>
+                        <span class="prayer-time-value" id="timeIsha">--:--</span>
+                    </div>
+                </div>
+                
+                <button class="btn-success" onclick="saveToBot()">📡 СОХРАНИТЬ В БОТА</button>
+                <div class="info">Нажмите, чтобы получать уведомления</div>
+            </div>
         </div>
 
-        <div class="card" id="resultBlock" style="display: none;">
-            <div style="text-align: center; font-size: 20px; font-weight: bold; margin-bottom: 10px;" id="cityName">
-                CITY
+        <!-- Страница: Тасбих -->
+        <div id="tasbih" class="page">
+            <div class="card tasbih-container">
+                <h2>📿 Тасбих</h2>
+                <div class="counter-display" id="counterDisplay">0</div>
+                
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+                </div>
+                
+                <button class="counter-button" onclick="incrementCounter()">
+                    <div style="font-size: 48px;">☝️</div>
+                    <div style="font-size: 16px; margin-top: 10px;">НАЖМИ</div>
+                </button>
+                
+                <div class="target-info" id="targetInfo">Цель: 33</div>
+                
+                <div class="tasbih-controls">
+                    <button class="btn-secondary" onclick="setTarget(33)">33</button>
+                    <button class="btn-secondary" onclick="setTarget(99)">99</button>
+                    <button class="btn-secondary" onclick="setTarget(100)">100</button>
+                    <button class="btn-secondary" onclick="resetCounter()">🔄 Сброс</button>
+                </div>
             </div>
             
-            <div class="result-row">
-                <span class="label">Фаджр</span>
-                <span class="value" id="fajrTime">--:--</span>
+            <div class="card">
+                <h2>📖 Зикры</h2>
+                <div style="padding: 10px 0; border-bottom: 1px solid #f0f0f0;">
+                    <div style="font-weight: bold; margin-bottom: 5px;">سُبْحَانَ اللهِ</div>
+                    <div style="color: #666; font-size: 14px;">Субханаллах (33 раза)</div>
+                </div>
+                <div style="padding: 10px 0; border-bottom: 1px solid #f0f0f0;">
+                    <div style="font-weight: bold; margin-bottom: 5px;">الْحَمْدُ لِلَّهِ</div>
+                    <div style="color: #666; font-size: 14px;">Альхамдулиллах (33 раза)</div>
+                </div>
+                <div style="padding: 10px 0;">
+                    <div style="font-weight: bold; margin-bottom: 5px;">اللهُ أَكْبَرُ</div>
+                    <div style="color: #666; font-size: 14px;">Аллаху Акбар (34 раза)</div>
+                </div>
             </div>
-            <div class="result-row">
-                <span class="label">Зухр</span>
-                <span class="value" id="dhuhrTime">--:--</span>
-            </div>
-            <div class="result-row">
-                <span class="label">Магриб</span>
-                <span class="value" id="maghribTime">--:--</span>
+        </div>
+
+        <!-- Страница: Настройки -->
+        <div id="settings" class="page">
+            <div class="card">
+                <h2>🔔 Уведомления</h2>
+                <div class="info" style="margin-bottom: 15px;">Включите уведомления для нужных намазов</div>
+                
+                <div class="setting-item">
+                    <span>🌅 Фаджр</span>
+                    <label class="switch">
+                        <input type="checkbox" id="notifFajr" checked onchange="saveNotificationSettings()">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="setting-item">
+                    <span>☀️ Зухр</span>
+                    <label class="switch">
+                        <input type="checkbox" id="notifDhuhr" checked onchange="saveNotificationSettings()">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="setting-item">
+                    <span>🌤 Аср</span>
+                    <label class="switch">
+                        <input type="checkbox" id="notifAsr" checked onchange="saveNotificationSettings()">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="setting-item">
+                    <span>🌇 Магриб</span>
+                    <label class="switch">
+                        <input type="checkbox" id="notifMaghrib" checked onchange="saveNotificationSettings()">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="setting-item">
+                    <span>🌙 Иша</span>
+                    <label class="switch">
+                        <input type="checkbox" id="notifIsha" checked onchange="saveNotificationSettings()">
+                        <span class="slider"></span>
+                    </label>
+                </div>
             </div>
 
-            <div id="coords-debug">GPS: 0.00, 0.00</div>
-
-            <button class="btn-save" onclick="saveData()">📡 СОХРАНИТЬ В БОТА</button>
+            <div class="card">
+                <h2>ℹ️ О приложении</h2>
+                <p style="color: #666; line-height: 1.6;">
+                    Muslim App - приложение для мусульман с точным расчетом времени намаза по методу 14 (Россия/Кавказ).
+                </p>
+                <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #f0f0f0; font-size: 13px; color: #999;">
+                    Версия 2.0<br>
+                    © 2025 Muslim App
+                </div>
+            </div>
         </div>
     </div>
 
     <script>
         const tg = window.Telegram.WebApp;
         tg.expand();
-
+        tg.setHeaderColor('#667eea');
+        
         let foundLat = 0;
         let foundLon = 0;
+        let counter = parseInt(localStorage.getItem('tasbihCounter') || '0');
+        let target = parseInt(localStorage.getItem('tasbihTarget') || '33');
 
+        // Инициализация
+        updateCounterDisplay();
+        loadNotificationSettings();
+
+        // Переключение вкладок
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            
+            event.target.classList.add('active');
+            document.getElementById(tabName).classList.add('active');
+        }
+
+        // Поиск города
         function searchCity() {
-            const city = document.getElementById('cityInput').value.trim();
-            if (!city) return tg.showAlert("Введите название города!");
-
-            document.getElementById('loader').style.display = 'block';
-            document.getElementById('resultBlock').style.display = 'none';
-
-            // Используем Method 14 (Russia/Caucasus) для правильного времени
+            let city = document.getElementById('cityInput').value.trim();
+            if(!city) {
+                tg.showAlert('Введите название города!');
+                return;
+            }
+            
+            tg.showPopup({
+                title: 'Поиск...',
+                message: 'Ищем время намаза для ' + city,
+                buttons: [{type: 'close'}]
+            });
+            
             fetch(`https://api.aladhan.com/v1/timingsByCity?city=${city}&country=&method=14`)
-                .then(response => response.json())
+                .then(res => res.json())
                 .then(data => {
-                    document.getElementById('loader').style.display = 'none';
-                    
-                    if (data.code === 200) {
-                        const timings = data.data.timings;
-                        const meta = data.data.meta;
-
-                        foundLat = meta.latitude;
-                        foundLon = meta.longitude;
-
-                        document.getElementById('cityName').innerText = city.toUpperCase();
-                        document.getElementById('fajrTime').innerText = timings.Fajr;
-                        document.getElementById('dhuhrTime').innerText = timings.Dhuhr;
-                        document.getElementById('maghribTime').innerText = timings.Maghrib;
+                    if(data.code === 200) {
+                        foundLat = data.data.meta.latitude;
+                        foundLon = data.data.meta.longitude;
                         
-                        // Показываем реальные координаты, чтобы ты видел, что это НЕ 8.888
-                        document.getElementById('coords-debug').innerText = `GPS: ${foundLat}, ${foundLon}`;
-
-                        document.getElementById('resultBlock').style.display = 'block';
+                        document.getElementById('cityName').innerText = '🕌 ' + city.toUpperCase();
+                        document.getElementById('coordsDebug').innerText = `GPS: ${foundLat}, ${foundLon}`;
+                        
+                        document.getElementById('timeFajr').innerText = data.data.timings.Fajr;
+                        document.getElementById('timeDhuhr').innerText = data.data.timings.Dhuhr;
+                        document.getElementById('timeAsr').innerText = data.data.timings.Asr;
+                        document.getElementById('timeMaghrib').innerText = data.data.timings.Maghrib;
+                        document.getElementById('timeIsha').innerText = data.data.timings.Isha;
+                        
+                        document.getElementById('prayerTimesCard').style.display = 'block';
+                        tg.showAlert('Время намаза найдено! Нажмите "Сохранить в бота" для получения уведомлений.');
                     } else {
-                        tg.showAlert("Город не найден. Попробуйте написать английскими буквами (Qusar).");
+                        tg.showAlert('Город не найден! Попробуйте другое название (например: Qusar, Baku, Makhachkala)');
                     }
                 })
-                .catch(error => {
-                    document.getElementById('loader').style.display = 'none';
-                    tg.showAlert("Ошибка соединения. Проверьте интернет.");
+                .catch(e => {
+                    tg.showAlert('Ошибка соединения: ' + e.message);
                 });
         }
 
-        function saveData() {
-            if (foundLat === 0) return tg.showAlert("Сначала найдите город!");
-
-            const dataToSend = {
+        // Сохранить в бота
+        function saveToBot() {
+            if(foundLat === 0) {
+                tg.showAlert('Сначала найдите город!');
+                return;
+            }
+            
+            tg.sendData(JSON.stringify({
                 action: 'sync_location',
                 lat: foundLat,
                 lon: foundLon,
                 offset: new Date().getTimezoneOffset()
-            };
-
-            tg.sendData(JSON.stringify(dataToSend));
+            }));
             tg.close();
+        }
+
+        // Тасбих
+        function incrementCounter() {
+            counter++;
+            localStorage.setItem('tasbihCounter', counter);
+            updateCounterDisplay();
+            
+            // Вибрация при достижении цели
+            if(counter === target) {
+                tg.HapticFeedback.notificationOccurred('success');
+                setTimeout(() => {
+                    tg.showAlert('🎉 Машаллах! Вы достигли ' + target + ' зикров!');
+                }, 100);
+            } else {
+                tg.HapticFeedback.impactOccurred('light');
+            }
+        }
+
+        function updateCounterDisplay() {
+            document.getElementById('counterDisplay').innerText = counter;
+            document.getElementById('targetInfo').innerText = `Цель: ${target} (осталось: ${Math.max(0, target - counter)})`;
+            
+            let progress = Math.min(100, (counter / target) * 100);
+            document.getElementById('progressFill').style.width = progress + '%';
+        }
+
+        function resetCounter() {
+            if(counter > 0) {
+                tg.showConfirm('Сбросить счетчик?', (confirmed) => {
+                    if(confirmed) {
+                        counter = 0;
+                        localStorage.setItem('tasbihCounter', '0');
+                        updateCounterDisplay();
+                        tg.HapticFeedback.notificationOccurred('warning');
+                    }
+                });
+            }
+        }
+
+        function setTarget(newTarget) {
+            target = newTarget;
+            localStorage.setItem('tasbihTarget', target);
+            updateCounterDisplay();
+            tg.HapticFeedback.impactOccurred('medium');
+        }
+
+        // Настройки уведомлений
+        function loadNotificationSettings() {
+            let saved = localStorage.getItem('notificationSettings');
+            if(saved) {
+                let settings = JSON.parse(saved);
+                document.getElementById('notifFajr').checked = settings.Fajr !== false;
+                document.getElementById('notifDhuhr').checked = settings.Dhuhr !== false;
+                document.getElementById('notifAsr').checked = settings.Asr !== false;
+                document.getElementById('notifMaghrib').checked = settings.Maghrib !== false;
+                document.getElementById('notifIsha').checked = settings.Isha !== false;
+            }
+        }
+
+        function saveNotificationSettings() {
+            let settings = {
+                Fajr: document.getElementById('notifFajr').checked,
+                Dhuhr: document.getElementById('notifDhuhr').checked,
+                Asr: document.getElementById('notifAsr').checked,
+                Maghrib: document.getElementById('notifMaghrib').checked,
+                Isha: document.getElementById('notifIsha').checked
+            };
+            
+            localStorage.setItem('notificationSettings', JSON.stringify(settings));
+            
+            tg.sendData(JSON.stringify({
+                action: 'update_notifications',
+                settings: settings
+            }));
+            
+            tg.HapticFeedback.notificationOccurred('success');
         }
     </script>
 </body>

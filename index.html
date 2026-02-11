@@ -1,158 +1,68 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html>
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Muslim App</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <style>
-        /* Твои стили (можно оставить как есть) */
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f2f2f7; padding-bottom: 80px; }
-        .tabs { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(255,255,255,0.9); backdrop-filter: blur(20px); display: flex; justify-content: space-around; border-top: 1px solid rgba(0,0,0,0.1); }
-        .tab { flex: 1; text-align: center; padding: 12px; cursor: pointer; }
-        .tab.active { color: #007aff; }
-        .card { background: white; border-radius: 16px; padding: 20px; margin-bottom: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.02); }
-        .current-time { font-size: 42px; font-weight: bold; text-align: center; }
-        .prayer-time { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #eee; }
-        .prayer-time-value { color: #007aff; font-weight: bold; }
-        .btn-success { background: #34c759; color: white; border: none; padding: 16px; border-radius: 12px; width: 100%; font-size: 16px; }
-        /* ... остальные стили ... */
-    </style>
+    <title>Muslim App</title>
+    <style>/* можно свои стили или минимальные */</style>
 </head>
 <body>
-    <div class="tabs">
-        <div class="tab active" onclick="switchTab('prayer')">🕌 Намаз</div>
-        <div class="tab" onclick="switchTab('tasbih')">📿 Тасбих</div>
-        <div class="tab" onclick="switchTab('settings')">⚙️ Настройки</div>
+    <div id="app">
+        <input type="text" id="city" placeholder="Город">
+        <button onclick="searchCity()">Найти</button>
+        <button onclick="getLocation()">GPS</button>
+        <div id="result"></div>
     </div>
-
-    <div class="content">
-        <div id="prayer" class="page active">
-            <!-- Карточка времени -->
-            <div class="card">
-                <h2>🕐 Текущее время</h2>
-                <div class="current-time" id="currentTime">--:--:--</div>
-            </div>
-
-            <!-- Поиск города -->
-            <div class="card">
-                <h2>📍 Определение местоположения</h2>
-                <input type="text" id="cityInput" placeholder="Город (например, Qusar)">
-                <button onclick="geocodeAndFetchCity()">🔍 Найти</button>
-                <button onclick="getLocationAndFetchTimes()">📍 Авто</button>
-                <button onclick="clearSavedLocation()">🗑️ Сменить</button>
-                <div id="geoStatus"></div>
-            </div>
-
-            <!-- Карточка времени намаза -->
-            <div class="card" id="prayerTimesCard" style="display:none;">
-                <h2 id="cityName">Время намаза</h2>
-                <div class="debug-info" id="coordsDebug"></div>
-                <div style="margin: 16px 0;">
-                    <div class="prayer-time"><span>🌅 Фаджр</span><span class="prayer-time-value" id="timeFajr">--:--</span></div>
-                    <div class="prayer-time"><span>☀️ Зухр</span><span class="prayer-time-value" id="timeDhuhr">--:--</span></div>
-                    <div class="prayer-time"><span>🌤 Аср</span><span class="prayer-time-value" id="timeAsr">--:--</span></div>
-                    <div class="prayer-time"><span>🌇 Магриб</span><span class="prayer-time-value" id="timeMaghrib">--:--</span></div>
-                    <div class="prayer-time"><span>🌙 Иша</span><span class="prayer-time-value" id="timeIsha">--:--</span></div>
-                </div>
-                <button class="btn-success" onclick="saveToBot()">📡 СОХРАНИТЬ В БОТА</button>
-                <div class="info">После сохранения бот пришлёт точное расписание (офлайн-расчёт)</div>
-            </div>
-        </div>
-        <!-- Страницы тасбих и настроек (без изменений, можешь оставить свои) -->
-    </div>
-
     <script>
-        const tg = Telegram.WebApp;
-        tg.expand();
+        const tg = Telegram.WebApp; tg.expand();
+        let lat, lon, tz;
 
-        let foundLat = 0, foundLon = 0, foundTimezone = '', foundCityName = '';
-
-        // --- Функции ---
-        function switchTab(tab) { /* твой код */ }
-
-        // Получение времени от API (ТОЛЬКО для предпросмотра)
-        async function fetchPrayerTimesByCoords(lat, lon, displayName) {
-            try {
-                const date = new Date();
-                const url = `https://api.aladhan.com/v1/timings/${date.getDate()}-${date.getMonth()+1}-${date.getFullYear()}?latitude=${lat}&longitude=${lon}&method=14&school=0`;
-                const res = await fetch(url);
-                const data = await res.json();
-                if (data.code === 200) {
-                    foundLat = lat; foundLon = lon; foundTimezone = data.data.meta.timezone; foundCityName = displayName;
-                    document.getElementById('cityName').innerHTML = `🕌 ${displayName} (${foundTimezone})`;
-                    document.getElementById('coordsDebug').innerHTML = `📍 ${lat.toFixed(4)}, ${lon.toFixed(4)}<br>🌍 ${foundTimezone}<br>⚠️ Это предварительное время! Точное время рассчитает бот.`;
-                    document.getElementById('timeFajr').innerText = data.data.timings.Fajr;
-                    document.getElementById('timeDhuhr').innerText = data.data.timings.Dhuhr;
-                    document.getElementById('timeAsr').innerText = data.data.timings.Asr;
-                    document.getElementById('timeMaghrib').innerText = data.data.timings.Maghrib;
-                    document.getElementById('timeIsha').innerText = data.data.timings.Isha;
-                    document.getElementById('prayerTimesCard').style.display = 'block';
-                    tg.HapticFeedback.notificationOccurred('success');
-                }
-            } catch (e) { console.error(e); }
-        }
-
-        // Геокодинг с точными координатами для Кусаров
-        async function geocodeAndFetchCity() {
-            let city = document.getElementById('cityInput').value.trim();
-            if (!city) return;
-            const exact = {
-                'кусары': { lat: 41.4288, lon: 48.4378, name: 'Кусары' },
-                'qusar': { lat: 41.4288, lon: 48.4378, name: 'Qusar' },
-                'самур': { lat: 41.6325, lon: 48.4302, name: 'Самур' },
-                'samur': { lat: 41.6325, lon: 48.4302, name: 'Samur' }
-            };
-            if (exact[city.toLowerCase()]) {
-                const c = exact[city.toLowerCase()];
-                await fetchPrayerTimesByCoords(c.lat, c.lon, c.name);
-                return;
+        async function searchCity() {
+            let city = document.getElementById('city').value;
+            let res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${city}&limit=1`);
+            let data = await res.json();
+            if (data.length) {
+                lat = data[0].lat; lon = data[0].lon;
+                fetchTimes(lat, lon, data[0].display_name.split(',')[0]);
             }
-            // обычный геокодинг
-            try {
-                const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(city)}&limit=1`, {
-                    headers: { 'User-Agent': 'MuslimApp/1.0' }
-                });
-                const data = await res.json();
-                if (data.length) {
-                    await fetchPrayerTimesByCoords(data[0].lat, data[0].lon, data[0].display_name.split(',')[0]);
-                }
-            } catch (e) { console.error(e); }
         }
 
-        // GPS
-        function getLocationAndFetchTimes() {
-            navigator.geolocation.getCurrentPosition(
-                pos => fetchPrayerTimesByCoords(pos.coords.latitude, pos.coords.longitude, 'Ваше местоположение'),
-                err => alert('Геолокация недоступна')
-            );
+        function getLocation() {
+            navigator.geolocation.getCurrentPosition(pos => {
+                lat = pos.coords.latitude; lon = pos.coords.longitude;
+                fetchTimes(lat, lon, 'Ваше местоположение');
+            });
         }
 
-        // Сохранение в бота — отправляем ТОЛЬКО координаты и часовой пояс
+        async function fetchTimes(lat, lon, name) {
+            let date = new Date();
+            let url = `https://api.aladhan.com/v1/timings/${date.getDate()}-${date.getMonth()+1}-${date.getFullYear()}?latitude=${lat}&longitude=${lon}&method=3&school=0`;
+            let res = await fetch(url);
+            let data = await res.json();
+            tz = data.data.meta.timezone;
+            document.getElementById('result').innerHTML = `
+                <h3>${name} (${tz})</h3>
+                Фаджр: ${data.data.timings.Fajr}<br>
+                Зухр: ${data.data.timings.Dhuhr}<br>
+                Аср: ${data.data.timings.Asr}<br>
+                Магриб: ${data.data.timings.Maghrib}<br>
+                Иша: ${data.data.timings.Isha}<br>
+                <button onclick="saveToBot()">Сохранить в бота</button>
+            `;
+        }
+
         function saveToBot() {
-            if (!foundLat) { alert('Сначала найдите город'); return; }
             tg.sendData(JSON.stringify({
                 action: 'sync_location',
-                lat: foundLat,
-                lon: foundLon,
+                lat: parseFloat(lat),
+                lon: parseFloat(lon),
                 offset: new Date().getTimezoneOffset(),
-                timezone: foundTimezone,
+                timezone: tz,
                 school: 0
             }));
             tg.close();
         }
-
-        // Загрузка сохранённого города
-        window.onload = () => {
-            const saved = localStorage.getItem('muslim_app_location');
-            if (saved) {
-                const d = JSON.parse(saved);
-                fetchPrayerTimesByCoords(d.lat, d.lon, d.cityName);
-            } else {
-                getLocationAndFetchTimes();
-            }
-        };
     </script>
 </body>
 </html>

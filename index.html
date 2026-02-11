@@ -7,30 +7,14 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         /* --- Muslim iOS Minimalist Theme --- */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-        }
-
         :root {
-            --bg: #F5F7F5; /* Очень светлый серо-зеленый оттенок */
+            --bg: #F2F2F7;
             --card-bg: #FFFFFF;
-            --text: #111827;
-            --secondary-text: #6B7280;
-            --border: rgba(0,0,0,0.05);
-            
-            /* Изумрудный акцент (Muslim Style) */
-            --accent: #10B981; 
-            --accent-dim: rgba(16, 185, 129, 0.1);
-            
-            --success: #34D399;
-            --warning: #FBBF24;
-            --danger: #EF4444;
-            
-            --shadow: 0 4px 20px rgba(0,0,0,0.03);
-            --radius: 20px;
+            --text: #000000;
+            --secondary: #8E8E93;
+            --accent: #10B981; /* Изумрудный */
+            --danger: #FF3B30;
+            --border: #E5E5EA;
         }
 
         @media (prefers-color-scheme: dark) {
@@ -38,641 +22,341 @@
                 --bg: #000000;
                 --card-bg: #1C1C1E;
                 --text: #FFFFFF;
-                --secondary-text: #9CA3AF;
-                --border: rgba(255,255,255,0.1);
-                --accent: #34D399;
-                --accent-dim: rgba(52, 211, 153, 0.15);
+                --secondary: #98989D;
+                --border: #38383A;
             }
         }
 
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, sans-serif;
-            background: var(--bg);
-            color: var(--text);
-            line-height: 1.5;
-            padding-bottom: 100px;
-            min-height: 100vh;
-            -webkit-font-smoothing: antialiased;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", Roboto, sans-serif; background: var(--bg); color: var(--text); padding-bottom: 100px; }
 
-        /* --- TABS --- */
-        .tabs {
-            position: fixed;
-            bottom: 20px;
-            left: 20px;
-            right: 20px;
-            background: var(--card-bg); /* Плашка в воздухе */
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            display: flex;
-            justify-content: space-around;
-            padding: 12px;
-            border-radius: 24px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            z-index: 100;
-            max-width: 400px;
-            margin: 0 auto;
-        }
-
-        .tab {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            color: var(--secondary-text);
-            font-size: 10px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: transform 0.2s, color 0.2s;
-        }
-        
-        .tab:active { transform: scale(0.9); }
-
-        .tab.active {
-            color: var(--accent);
-        }
-
-        .tab svg {
-            width: 24px;
-            height: 24px;
-            margin-bottom: 4px;
-            fill: currentColor;
-        }
-
-        .content {
-            padding: 20px;
-            max-width: 480px;
-            margin: 0 auto;
-        }
-
-        .page {
-            display: none;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-
-        .page.active {
-            display: block;
-            opacity: 1;
-        }
-
-        /* --- CARDS --- */
-        .card {
-            background: var(--card-bg);
-            border-radius: var(--radius);
-            padding: 24px;
-            margin-bottom: 16px;
-            box-shadow: var(--shadow);
-            border: 1px solid var(--border);
-        }
-
-        h2 {
-            font-size: 20px;
-            font-weight: 700;
-            margin-bottom: 16px;
-            color: var(--text);
-            letter-spacing: -0.5px;
-        }
-
-        /* --- HERO: NEXT PRAYER --- */
-        .hero-card {
-            text-align: center;
-            background: linear-gradient(135deg, var(--accent), #059669);
-            color: white;
+        /* HERO CARD */
+        .hero {
+            background: linear-gradient(135deg, #10B981, #047857);
             padding: 30px 20px;
-            border-radius: 24px;
-            margin-bottom: 20px;
-            box-shadow: 0 10px 30px rgba(16, 185, 129, 0.3);
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .hero-pattern {
-            position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            opacity: 0.1;
-            background-image: radial-gradient(circle at 2px 2px, white 1px, transparent 0);
-            background-size: 20px 20px;
-        }
-
-        .next-label {
-            font-size: 14px;
-            opacity: 0.9;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 8px;
-            position: relative;
-        }
-
-        .next-name {
-            font-size: 36px;
-            font-weight: 800;
-            margin-bottom: 4px;
-            position: relative;
-        }
-
-        .next-timer {
-            font-size: 16px;
-            font-weight: 500;
-            opacity: 0.9;
-            background: rgba(255,255,255,0.2);
-            padding: 6px 16px;
-            border-radius: 20px;
-            display: inline-block;
-            margin-top: 10px;
-            position: relative;
-        }
-
-        /* --- PRAYER LIST --- */
-        .prayer-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 16px 0;
-            border-bottom: 1px solid var(--border);
-            transition: background 0.2s;
-        }
-        
-        .prayer-row:last-child { border-bottom: none; }
-        
-        .prayer-row.current-prayer {
-            background: var(--accent-dim);
-            margin: 0 -24px;
-            padding: 16px 24px;
-            border-left: 4px solid var(--accent);
-        }
-
-        .p-name {
-            font-size: 17px;
-            font-weight: 500;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-        
-        .p-time {
-            font-size: 18px;
-            font-weight: 600;
-            font-feature-settings: "tnum";
-            color: var(--secondary-text);
-        }
-        
-        .current-prayer .p-time { color: var(--accent); }
-        .current-prayer .p-name { color: var(--accent); font-weight: 700; }
-
-        /* --- BUTTONS --- */
-        .btn {
-            width: 100%;
-            border: none;
-            border-radius: 16px;
-            padding: 16px;
-            font-size: 17px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: transform 0.1s;
+            color: white;
+            border-bottom-left-radius: 24px;
+            border-bottom-right-radius: 24px;
+            box-shadow: 0 4px 20px rgba(16, 185, 129, 0.3);
             text-align: center;
-            margin-top: 10px;
+            margin-bottom: 20px;
         }
-        
-        .btn:active { transform: scale(0.98); }
-        
-        .btn-primary {
-            background: var(--accent);
-            color: white;
-            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
-        }
-        
-        .btn-outline {
-            background: transparent;
-            border: 1px solid var(--border);
-            color: var(--text);
-        }
-        
-        .search-container {
-            position: relative;
-            margin-bottom: 12px;
-        }
-        
-        .search-input {
-            width: 100%;
-            padding: 16px;
-            padding-right: 50px;
-            border-radius: 16px;
-            border: 1px solid var(--border);
-            background: var(--bg);
-            font-size: 16px;
-            color: var(--text);
-        }
-        
-        .search-btn {
-            position: absolute;
-            right: 8px;
-            top: 8px;
-            background: var(--accent);
-            color: white;
-            border: none;
-            width: 40px;
-            height: 40px;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-        }
+        .hero-title { font-size: 14px; opacity: 0.9; text-transform: uppercase; letter-spacing: 1px; }
+        .hero-name { font-size: 32px; font-weight: 800; margin: 4px 0; }
+        .hero-timer { background: rgba(255,255,255,0.2); padding: 6px 14px; border-radius: 20px; font-size: 15px; display: inline-block; backdrop-filter: blur(5px); }
 
-        /* --- TASBIH --- */
-        .counter-circle {
-            width: 240px;
-            height: 240px;
-            border-radius: 50%;
-            background: radial-gradient(circle at 30% 30%, var(--accent), #059669);
-            margin: 20px auto;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            color: white;
-            box-shadow: 0 10px 40px rgba(16, 185, 129, 0.4);
-            cursor: pointer;
-            transition: transform 0.1s;
-        }
+        /* CONTENT */
+        .container { padding: 0 16px; max-width: 480px; margin: 0 auto; }
+        .card { background: var(--card-bg); border-radius: 16px; padding: 16px; margin-bottom: 16px; }
         
-        .counter-circle:active { transform: scale(0.95); }
-        
-        .counter-val { font-size: 72px; font-weight: 700; line-height: 1; }
-        .counter-lbl { font-size: 16px; opacity: 0.8; margin-top: 8px; }
+        /* SEARCH */
+        .search-box { display: flex; gap: 8px; margin-bottom: 12px; }
+        .input-loc { flex: 1; padding: 12px; border-radius: 12px; border: none; background: rgba(118,118,128,0.12); color: var(--text); font-size: 16px; }
+        .btn-icon { width: 44px; background: var(--accent); color: white; border: none; border-radius: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 18px; }
 
-        /* --- UTILS --- */
-        .status-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 6px 12px;
-            background: var(--accent-dim);
-            color: var(--accent);
-            border-radius: 20px;
-            font-size: 13px;
-            font-weight: 600;
-            margin-top: 10px;
-        }
+        /* PRAYER LIST */
+        .row { display: flex; justify-content: space-between; align-items: center; padding: 14px 0; border-bottom: 0.5px solid var(--border); }
+        .row:last-child { border-bottom: none; }
+        .row.active { color: var(--accent); font-weight: 700; }
 
-        .switch { position: relative; display: inline-block; width: 50px; height: 30px; }
+        /* SETTINGS & SLIDERS */
+        .setting-row { display: flex; justify-content: space-between; align-items: center; padding: 16px 0; border-bottom: 0.5px solid var(--border); }
+        .switch { position: relative; display: inline-block; width: 51px; height: 31px; }
         .switch input { opacity: 0; width: 0; height: 0; }
-        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #E5E7EB; transition: .4s; border-radius: 34px; }
-        .slider:before { position: absolute; content: ""; height: 26px; width: 26px; left: 2px; bottom: 2px; background-color: white; transition: .4s; border-radius: 50%; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #E9E9EA; transition: .3s; border-radius: 34px; }
+        .slider:before { position: absolute; content: ""; height: 27px; width: 27px; left: 2px; bottom: 2px; background-color: white; transition: .3s; border-radius: 50%; box-shadow: 0 3px 8px rgba(0,0,0,0.15); }
         input:checked + .slider { background-color: var(--accent); }
         input:checked + .slider:before { transform: translateX(20px); }
+
+        /* TABS */
+        .tabs { position: fixed; bottom: 0; width: 100%; background: var(--card-bg); border-top: 0.5px solid var(--border); display: flex; justify-content: space-around; padding: 10px 0 25px; z-index: 99; }
+        .tab-btn { background: none; border: none; color: var(--secondary); font-size: 10px; display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; }
+        .tab-btn.active { color: var(--accent); }
+        .tab-btn svg { width: 24px; height: 24px; fill: currentColor; }
+
+        /* PAGES */
+        .page { display: none; animation: fadeIn 0.3s; }
+        .page.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        /* BUTTONS */
+        .btn-main { width: 100%; background: var(--accent); color: white; border: none; padding: 16px; border-radius: 14px; font-weight: 600; font-size: 17px; margin-top: 10px; cursor: pointer; }
+        .btn-sec { background: rgba(118,118,128,0.12); color: var(--text); border: none; padding: 10px 20px; border-radius: 10px; font-weight: 500; cursor: pointer; }
+
+        /* TASBIH */
+        .tasbih-circle { width: 220px; height: 220px; border-radius: 50%; background: var(--accent); margin: 20px auto; display: flex; flex-direction: column; justify-content: center; align-items: center; color: white; box-shadow: 0 10px 30px rgba(16, 185, 129, 0.4); }
+        .tasbih-val { font-size: 70px; font-weight: 800; line-height: 1; }
     </style>
 </head>
 <body>
 
-    <div class="content">
-        <div id="prayer" class="page active">
-            
-            <div class="hero-card" id="heroCard" style="display: none;">
-                <div class="hero-pattern"></div>
-                <div class="next-label">Следующий намаз</div>
-                <div class="next-name" id="nextPrayerName">--</div>
-                <div class="next-timer" id="nextPrayerTimer">--:--:--</div>
-            </div>
+    <div class="hero">
+        <div class="hero-title">Следующий намаз</div>
+        <div class="hero-name" id="heroName">Загрузка...</div>
+        <div class="hero-timer" id="heroTimer">--:--:--</div>
+    </div>
 
+    <div class="container">
+        <div id="p-prayer" class="page active">
             <div class="card">
-                <div class="search-container">
-                    <input type="text" class="search-input" id="cityInput" placeholder="Поиск города (напр. Baku)">
-                    <button class="search-btn" onclick="geocodeAndFetchCity()">🔍</button>
+                <div class="search-box">
+                    <input type="text" id="cityInput" class="input-loc" placeholder="Изменить город (напр. Москва)">
+                    <button class="btn-icon" onclick="geocode()">🔍</button>
+                    <button class="btn-icon" style="background:#007AFF" onclick="getGPS()">📍</button>
                 </div>
+                <div id="locationStatus" style="font-size: 13px; color: var(--secondary); text-align: center; margin-bottom: 8px;"></div>
                 
-                <div style="display: flex; gap: 10px;">
-                    <button class="btn btn-outline" onclick="getLocationAndFetchTimes()" style="margin-top: 0;">📍 GPS</button>
-                    <button class="btn btn-outline" onclick="clearSavedLocation()" style="margin-top: 0;">🗑 Сброс</button>
-                </div>
+                <div id="prayerList"></div>
                 
-                <div id="geoStatus" style="margin-top: 12px; font-size: 14px; color: var(--secondary-text); text-align: center;"></div>
-            </div>
-
-            <div class="card" id="prayerTimesCard" style="display:none;">
-                <h2 id="cityName" style="font-size: 22px;">Расписание</h2>
-                
-                <div id="prayerList">
-                    </div>
-                
-                <button class="btn btn-primary" onclick="saveToBot()">
-                    📡 Сохранить настройки
+                <button class="btn-main" onclick="saveToBot()">
+                    Сохранить настройки
                 </button>
-                <div style="text-align: center; font-size: 12px; color: var(--secondary-text); margin-top: 12px;">
-                    Бот будет присылать уведомления
+            </div>
+        </div>
+
+        <div id="p-tasbih" class="page">
+            <div class="card" style="text-align:center;">
+                <h2 style="margin-bottom:10px;">Электронный тасбих</h2>
+                <div class="tasbih-circle" onclick="clickTasbih()">
+                    <div class="tasbih-val" id="cnt">0</div>
+                    <div style="font-size:14px; opacity:0.8;">Нажмите</div>
+                </div>
+                <div style="color:var(--accent); font-weight:600; margin-bottom:15px;" id="tgt">Цель: 33</div>
+                <div style="display:flex; justify-content:center; gap:10px;">
+                    <button class="btn-sec" onclick="setTarget(33)">33</button>
+                    <button class="btn-sec" onclick="setTarget(99)">99</button>
+                    <button class="btn-sec" style="color:var(--danger);" onclick="resetTasbih()">Сброс</button>
                 </div>
             </div>
         </div>
 
-        <div id="tasbih" class="page">
-            <div class="counter-circle" onclick="incrementCounter()">
-                <div class="counter-val" id="counterDisplay">0</div>
-                <div class="counter-lbl">Нажмите</div>
-            </div>
-            
-            <div class="card" style="text-align: center;">
-                <div id="targetInfo" style="font-size: 18px; font-weight: 600; color: var(--accent); margin-bottom: 16px;">Цель: 33</div>
-                <div style="display: flex; gap: 8px; justify-content: center;">
-                    <button class="btn btn-outline" onclick="setTarget(33)" style="width: auto; padding: 10px 20px;">33</button>
-                    <button class="btn btn-outline" onclick="setTarget(99)" style="width: auto; padding: 10px 20px;">99</button>
-                    <button class="btn btn-outline" onclick="resetCounter()" style="width: auto; padding: 10px 20px; border-color: var(--danger); color: var(--danger);">Сброс</button>
-                </div>
-            </div>
-
+        <div id="p-settings" class="page">
             <div class="card">
-                <div style="display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--border);">
-                    <span style="font-size: 18px;">سبحان الله</span>
-                    <span style="color: var(--secondary-text);">Субханаллах</span>
-                </div>
-                <div style="display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--border);">
-                    <span style="font-size: 18px;">الحمد لله</span>
-                    <span style="color: var(--secondary-text);">Альхамдулиллах</span>
-                </div>
-                <div style="display: flex; justify-content: space-between; padding: 12px 0;">
-                    <span style="font-size: 18px;">الله أكبر</span>
-                    <span style="color: var(--secondary-text);">Аллаху Акбар</span>
-                </div>
+                <h2 style="margin-bottom:15px;">Уведомления</h2>
+                <div id="settingsList"></div>
             </div>
-        </div>
-
-        <div id="settings" class="page">
             <div class="card">
-                <h2>🔔 Уведомления</h2>
-                <div id="settingsList">
-                    </div>
-            </div>
-            
-            <div class="card">
-                <h2>ℹ️ Информация</h2>
-                <p style="color: var(--secondary-text); font-size: 14px;">
-                    Метод расчёта: <strong>MWL (World Islamic League)</strong><br>
-                    Углы: 18° / 17°<br>
-                    Мазхаб: Шафиитский
-                </p>
-                <div style="margin-top: 16px; font-size: 12px; color: var(--accent);">
-                    Version 8.0 Muslim Style
+                <div style="font-size:13px; color:var(--secondary); line-height:1.4;">
+                    Используется метод <b>MWL</b> (Всемирная Исламская Лига).<br>
+                    Углы: 18° / 17°.<br>
+                    Город сохраняется автоматически.
                 </div>
             </div>
         </div>
     </div>
 
     <div class="tabs">
-        <div class="tab active" onclick="switchTab(event, 'prayer')">
-            <svg viewBox="0 0 24 24"><path d="M12 2L2 12h3v8h6v-6h2v6h6v-8h3L12 2z"/></svg>
+        <button class="tab-btn active" onclick="tab('p-prayer', this)">
+            <svg viewBox="0 0 24 24"><path d="M12 2L2 12h3v8h6v-6h2v6h6v-8h3z"/></svg>
             <span>Намаз</span>
-        </div>
-        <div class="tab" onclick="switchTab(event, 'tasbih')">
-            <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/><circle cx="12" cy="12" r="3"/></svg>
+        </button>
+        <button class="tab-btn" onclick="tab('p-tasbih', this)">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="2"/></svg>
             <span>Тасбих</span>
-        </div>
-        <div class="tab" onclick="switchTab(event, 'settings')">
-            <svg viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58a.49.49 0 0 0 .12-.61l-1.92-3.32a.488.488 0 0 0-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54a.484.484 0 0 0-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.04.17 0 .36.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58a.49.49 0 0 0-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.04-.22 0-.45-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
+        </button>
+        <button class="tab-btn" onclick="tab('p-settings', this)">
+            <svg viewBox="0 0 24 24"><path d="M19.4 13c.1-.3.1-.6.1-1s0-.7-.1-1l2.1-1.7c.2-.2.2-.4.1-.6l-2-3.5c-.1-.2-.3-.3-.5-.2l-2.5 1c-.5-.4-1.1-.8-1.7-1l-.4-2.6c-.1-.2-.3-.4-.5-.4h-4c-.3 0-.5.2-.5.4l-.4 2.6c-.6.3-1.2.6-1.7 1l-2.5-1c-.2-.1-.4 0-.5.2l-2 3.5c-.1.2-.1.5.1.6l2.1 1.7c-.1.3-.1.6-.1 1s0 .7.1 1l-2.1 1.7c-.2.2-.2.4-.1.6l2 3.5c.1.2.3.3.5.2l2.5-1c.5.4 1.1.8 1.7 1l.4 2.6c0 .2.2.4.5.4h4c.3 0 .5-.2.5-.4l.4-2.6c.6-.3 1.2-.6 1.7-1l2.5 1c.2.1.4 0 .5-.2l2-3.5c.1-.2.1-.5-.1-.6l-2.1-1.7zM12 15.5c-1.9 0-3.5-1.6-3.5-3.5s1.6-3.5 3.5-3.5 3.5 1.6 3.5 3.5-1.6 3.5-3.5 3.5z"/></svg>
             <span>Настройки</span>
-        </div>
+        </button>
     </div>
 
     <script>
         const tg = window.Telegram.WebApp;
         tg.expand();
 
-        // --- GLOBAL VARS ---
-        let currentTimings = null;
-        let foundLat = 0, foundLon = 0, foundTimezone = '';
-        const METHOD = 3; 
-        const SCHOOL = 0;
+        // --- ДАННЫЕ ---
+        let timingsData = null;
+        let cityData = { lat: 0, lon: 0, name: '', tz: '' };
+        let counter = parseInt(localStorage.getItem('cnt') || 0);
+        let target = parseInt(localStorage.getItem('tgt') || 33);
 
-        let counter = parseInt(localStorage.getItem('tasbihCounter') || '0');
-        let target = parseInt(localStorage.getItem('tasbihTarget') || '33');
-
-        // --- INIT ---
-        window.addEventListener('load', () => {
-            updateCounterDisplay();
+        // --- ИНИЦИАЛИЗАЦИЯ ---
+        window.onload = () => {
+            loadCity(); // ЗАГРУЗКА СОХРАНЕННОГО ГОРОДА
+            updateTasbihUI();
             renderSettings();
-            loadSavedLocation();
-            setInterval(updateNextPrayerUI, 1000);
-        });
+            setInterval(updateTimer, 1000);
+        };
 
-        // --- TABS ---
-        function switchTab(e, id) {
-            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            e.currentTarget.classList.add('active');
-            document.getElementById(id).classList.add('active');
-        }
-
-        // --- LOGIC: NEXT PRAYER & UI ---
-        function updateNextPrayerUI() {
-            if (!currentTimings) return;
-            
-            const now = new Date();
-            const timeNowStr = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
-            
-            const prayers = [
-                { en: 'Fajr', ru: 'Фаджр', icon: '🌅' },
-                { en: 'Dhuhr', ru: 'Зухр', icon: '☀️' },
-                { en: 'Asr', ru: 'Аср', icon: '🌤' },
-                { en: 'Maghrib', ru: 'Магриб', icon: '🌇' },
-                { en: 'Isha', ru: 'Иша', icon: '🌙' }
-            ];
-
-            let nextP = null;
-            let minDiff = Infinity;
-
-            // Находим следующий намаз
-            for (let p of prayers) {
-                const pTime = currentTimings[p.en];
-                const [h, m] = pTime.split(':').map(Number);
-                let pDate = new Date();
-                pDate.setHours(h, m, 0, 0);
-
-                if (pDate < now) {
-                    pDate.setDate(pDate.getDate() + 1); // Если время прошло, значит это завтра
-                }
-
-                const diff = pDate - now;
-                if (diff < minDiff) {
-                    minDiff = diff;
-                    nextP = { ...p, date: pDate };
-                }
-            }
-
-            // UI Update: Hero Card
-            if (nextP) {
-                document.getElementById('heroCard').style.display = 'block';
-                document.getElementById('nextPrayerName').textContent = nextP.ru;
-                
-                const hours = Math.floor(minDiff / (1000 * 60 * 60));
-                const minutes = Math.floor((minDiff % (1000 * 60 * 60)) / (1000 * 60));
-                const seconds = Math.floor((minDiff % (1000 * 60)) / 1000);
-                
-                document.getElementById('nextPrayerTimer').textContent = 
-                    `Через ${hours}:${String(minutes).padStart(2,'0')}:${String(seconds).padStart(2,'0')}`;
-            }
-
-            // UI Update: Highlight Row
-            // Сброс подсветки
-            document.querySelectorAll('.prayer-row').forEach(row => row.classList.remove('current-prayer'));
-            // Логика: подсвечиваем тот, что СЕЙЧАС (прошлый), или следующий? 
-            // Обычно подсвечивают следующий как "актуальный".
-            if (nextP) {
-                const rowId = `row-${nextP.en}`;
-                const el = document.getElementById(rowId);
-                if (el) el.classList.add('current-prayer');
+        // --- ЛОГИКА ГОРОДА ---
+        function loadCity() {
+            const saved = localStorage.getItem('muslim_city');
+            if (saved) {
+                // Если есть сохраненный город - сразу показываем!
+                cityData = JSON.parse(saved);
+                document.getElementById('locationStatus').innerText = `📍 Сохранено: ${cityData.name}`;
+                document.getElementById('cityInput').value = cityData.name; // Заполняем поле, чтобы можно было поменять
+                fetchTimes(cityData.lat, cityData.lon);
+            } else {
+                document.getElementById('heroName').innerText = "Выберите город";
+                document.getElementById('locationStatus').innerText = "Используйте поиск или GPS";
             }
         }
 
-        function renderPrayerList(timings) {
-            currentTimings = timings;
-            const container = document.getElementById('prayerList');
-            container.innerHTML = '';
-            
-            const map = [
-                { k: 'Fajr', n: 'Фаджр', i: '🌅' },
-                { k: 'Dhuhr', n: 'Зухр', i: '☀️' },
-                { k: 'Asr', n: 'Аср', i: '🌤' },
-                { k: 'Maghrib', n: 'Магриб', i: '🌇' },
-                { k: 'Isha', n: 'Иша', i: '🌙' }
-            ];
-
-            map.forEach(item => {
-                const time = timings[item.k];
-                container.innerHTML += `
-                    <div class="prayer-row" id="row-${item.k}">
-                        <div class="p-name"><span>${item.i}</span> ${item.n}</div>
-                        <div class="p-time">${time}</div>
-                    </div>
-                `;
-            });
-            updateNextPrayerUI();
-        }
-
-        // --- SETTINGS RENDER ---
-        function renderSettings() {
-            const list = document.getElementById('settingsList');
-            const saved = JSON.parse(localStorage.getItem('notificationSettings') || '{}');
-            const map = [
-                { k: 'Fajr', n: 'Фаджр' },
-                { k: 'Dhuhr', n: 'Зухр' },
-                { k: 'Asr', n: 'Аср' },
-                { k: 'Maghrib', n: 'Магриб' },
-                { k: 'Isha', n: 'Иша' }
-            ];
-            
-            list.innerHTML = '';
-            map.forEach(item => {
-                const isChecked = saved[item.k] !== false ? 'checked' : '';
-                list.innerHTML += `
-                    <div class="setting-item" style="display:flex; justify-content:space-between; padding:12px 0; border-bottom:1px solid var(--border);">
-                        <span>${item.n}</span>
-                        <label class="switch">
-                            <input type="checkbox" id="notif${item.k}" ${isChecked} onchange="saveNotificationSettings()">
-                            <span class="slider"></span>
-                        </label>
-                    </div>
-                `;
-            });
-        }
-
-        // --- LOCATION & API ---
-        const STORAGE_KEY = 'muslim_app_location';
-
-        async function fetchPrayerTimesByCoords(lat, lon, name) {
+        async function fetchTimes(lat, lon) {
             try {
-                const date = new Date();
-                const dateStr = `${date.getDate().toString().padStart(2,'0')}-${(date.getMonth()+1).toString().padStart(2,'0')}-${date.getFullYear()}`;
-                const url = `https://api.aladhan.com/v1/timings/${dateStr}?latitude=${lat}&longitude=${lon}&method=${METHOD}&school=${SCHOOL}`;
-                
+                const date = new Date().toISOString().split('T')[0].split('-').reverse().join('-');
+                const url = `https://api.aladhan.com/v1/timings/${date}?latitude=${lat}&longitude=${lon}&method=3&school=0`;
                 const res = await fetch(url);
                 const data = await res.json();
                 
                 if (data.code === 200) {
-                    foundLat = lat; foundLon = lon; foundTimezone = data.data.meta.timezone;
-                    document.getElementById('cityName').textContent = name;
-                    renderPrayerList(data.data.timings);
+                    timingsData = data.data.timings;
+                    cityData.lat = lat; 
+                    cityData.lon = lon; 
+                    cityData.tz = data.data.meta.timezone;
                     
-                    document.getElementById('prayerTimesCard').style.display = 'block';
-                    document.getElementById('heroCard').style.display = 'block';
+                    // Сохраняем в память телефона
+                    localStorage.setItem('muslim_city', JSON.stringify(cityData));
                     
-                    localStorage.setItem(STORAGE_KEY, JSON.stringify({ lat, lon, timezone: foundTimezone, cityName: name }));
-                    document.getElementById('geoStatus').innerHTML = `✅ ${name}`;
+                    renderPrayerList();
+                    updateTimer();
                 }
             } catch (e) {
-                document.getElementById('geoStatus').textContent = "Ошибка загрузки";
+                alert("Ошибка загрузки расписания");
             }
         }
 
-        function getLocationAndFetchTimes() {
-            const st = document.getElementById('geoStatus');
-            st.textContent = "⏳ Определяем...";
-            if(!navigator.geolocation) return;
-            navigator.geolocation.getCurrentPosition(
-                p => fetchPrayerTimesByCoords(p.coords.latitude, p.coords.longitude, "GPS Локация"),
-                e => st.textContent = "❌ Ошибка GPS"
-            );
-        }
-
-        async function geocodeAndFetchCity() {
+        async function geocode() {
             const city = document.getElementById('cityInput').value;
             if(!city) return;
-            const st = document.getElementById('geoStatus');
-            st.textContent = "🔍 Поиск...";
-            try {
-                const r = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${city}&limit=1`);
-                const d = await r.json();
-                if(d.length) fetchPrayerTimesByCoords(d[0].lat, d[0].lon, d[0].display_name.split(',')[0]);
-                else st.textContent = "❌ Не найдено";
-            } catch { st.textContent = "❌ Ошибка сети"; }
-        }
-
-        function loadSavedLocation() {
-            const s = localStorage.getItem(STORAGE_KEY);
-            if(s) {
-                const d = JSON.parse(s);
-                fetchPrayerTimesByCoords(d.lat, d.lon, d.cityName);
+            const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${city}&limit=1`);
+            const data = await res.json();
+            if(data.length) {
+                cityData.name = data[0].display_name.split(',')[0];
+                fetchTimes(data[0].lat, data[0].lon);
+                document.getElementById('locationStatus').innerText = `📍 Найден: ${cityData.name}`;
+            } else {
+                alert("Город не найден");
             }
         }
 
-        function clearSavedLocation() {
-            localStorage.removeItem(STORAGE_KEY);
-            location.reload();
-        }
-
-        // --- BOT SYNC ---
-        function saveToBot() {
-            if(!foundLat) return;
-            tg.sendData(JSON.stringify({
-                action: 'sync_location', lat: foundLat, lon: foundLon,
-                timezone: foundTimezone, school: SCHOOL, method: METHOD, 
-                offset: new Date().getTimezoneOffset()
-            }));
-        }
-
-        // --- NOTIFICATIONS ---
-        function saveNotificationSettings() {
-            const settings = {};
-            ['Fajr','Dhuhr','Asr','Maghrib','Isha'].forEach(k => {
-                settings[k] = document.getElementById(`notif${k}`).checked;
+        function getGPS() {
+            if(!navigator.geolocation) return alert("Нет GPS");
+            navigator.geolocation.getCurrentPosition(pos => {
+                cityData.name = "GPS Локация";
+                fetchTimes(pos.coords.latitude, pos.coords.longitude);
+                document.getElementById('cityInput').value = "Мое местоположение";
             });
-            localStorage.setItem('notificationSettings', JSON.stringify(settings));
-            tg.sendData(JSON.stringify({ action: 'update_notifications', settings }));
         }
 
-        // --- TASBIH ---
-        function updateCounterDisplay() {
-            document.getElementById('counterDisplay').innerText = counter;
-            document.getElementById('progressFill').style.width = `${Math.min(100, (counter / target) * 100)}%`;
-            document.getElementById('targetInfo').innerText = `Цель: ${target}`;
+        // --- UI НАМАЗОВ ---
+        function renderPrayerList() {
+            const list = document.getElementById('prayerList');
+            list.innerHTML = '';
+            const names = { Fajr:"Фаджр", Dhuhr:"Зухр", Asr:"Аср", Maghrib:"Магриб", Isha:"Иша" };
+            const icons = { Fajr:"🌅", Dhuhr:"☀️", Asr:"🌤", Maghrib:"🌇", Isha:"🌙" };
+            
+            for(let key in names) {
+                list.innerHTML += `
+                    <div class="row" id="row-${key}">
+                        <div>${icons[key]} ${names[key]}</div>
+                        <div style="font-size:18px;">${timingsData[key]}</div>
+                    </div>
+                `;
+            }
         }
-        function incrementCounter() {
-            counter++; localStorage.setItem('tasbihCounter', counter);
-            updateCounterDisplay();
+
+        function updateTimer() {
+            if(!timingsData) return;
+            const now = new Date();
+            let nextName = '', minDiff = Infinity;
+            
+            for(let key in timingsData) {
+                if(['Sunrise','Sunset','Imsak','Midnight','Firstthird','Lastthird'].includes(key)) continue;
+                
+                const [h,m] = timingsData[key].split(':');
+                let pTime = new Date();
+                pTime.setHours(h, m, 0, 0);
+                if(pTime < now) pTime.setDate(pTime.getDate() + 1);
+                
+                const diff = pTime - now;
+                if(diff < minDiff) {
+                    minDiff = diff;
+                    nextName = { Fajr:"Фаджр", Dhuhr:"Зухр", Asr:"Аср", Maghrib:"Магриб", Isha:"Иша" }[key];
+                }
+            }
+            
+            document.getElementById('heroName').innerText = nextName;
+            const hh = Math.floor(minDiff / 3600000);
+            const mm = Math.floor((minDiff % 3600000) / 60000);
+            const ss = Math.floor((minDiff % 60000) / 1000);
+            document.getElementById('heroTimer').innerText = `${hh}:${String(mm).padStart(2,'0')}:${String(ss).padStart(2,'0')}`;
+        }
+
+        // --- ТАСБИХ ---
+        function clickTasbih() {
+            counter++;
             if(counter === target) tg.HapticFeedback.notificationOccurred('success');
             else tg.HapticFeedback.impactOccurred('light');
+            saveTasbih();
         }
-        function setTarget(t) { target = t; localStorage.setItem('tasbihTarget', t); updateCounterDisplay(); }
-        function resetCounter() { 
-            tg.showConfirm('Сбросить?', ok => { if(ok) { counter=0; localStorage.setItem('tasbihCounter',0); updateCounterDisplay(); }});
+        function resetTasbih() { counter = 0; saveTasbih(); }
+        function setTarget(t) { target = t; saveTasbih(); }
+        function saveTasbih() {
+            localStorage.setItem('cnt', counter);
+            localStorage.setItem('tgt', target);
+            updateTasbihUI();
+        }
+        function updateTasbihUI() {
+            document.getElementById('cnt').innerText = counter;
+            document.getElementById('tgt').innerText = `Цель: ${target}`;
+        }
+
+        // --- НАСТРОЙКИ (ПОЛЗУНКИ) ---
+        function renderSettings() {
+            const list = document.getElementById('settingsList');
+            const conf = JSON.parse(localStorage.getItem('notif_conf') || '{}');
+            const names = { Fajr:"Фаджр", Dhuhr:"Зухр", Asr:"Аср", Maghrib:"Магриб", Isha:"Иша" };
+            
+            list.innerHTML = '';
+            for(let key in names) {
+                const checked = conf[key] !== false ? 'checked' : '';
+                list.innerHTML += `
+                    <div class="setting-row">
+                        <span>${names[key]}</span>
+                        <label class="switch">
+                            <input type="checkbox" id="chk-${key}" ${checked} onchange="saveSettings()">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                `;
+            }
+        }
+
+        function saveSettings() {
+            const conf = {};
+            ['Fajr','Dhuhr','Asr','Maghrib','Isha'].forEach(k => {
+                conf[k] = document.getElementById(`chk-${k}`).checked;
+            });
+            localStorage.setItem('notif_conf', JSON.stringify(conf));
+            // Отправка в бот только при сохранении общего профиля или можно сразу
+        }
+
+        // --- ОТПРАВКА В БОТ ---
+        function saveToBot() {
+            if(!cityData.lat) return alert("Сначала выберите город!");
+            
+            // Сохраняем настройки уведомлений тоже
+            const notifSettings = JSON.parse(localStorage.getItem('notif_conf') || '{}');
+            
+            const payload = {
+                action: 'sync_location',
+                lat: cityData.lat,
+                lon: cityData.lon,
+                city: cityData.name, // Передаем имя города!
+                tz: cityData.tz,
+                settings: notifSettings
+            };
+            tg.sendData(JSON.stringify(payload));
+        }
+
+        // --- ТАБЫ ---
+        function tab(id, btn) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            btn.classList.add('active');
         }
     </script>
 </body>

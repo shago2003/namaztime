@@ -14,7 +14,6 @@
             -webkit-tap-highlight-color: transparent;
         }
 
-        /* Светлая тема (по умолчанию) */
         :root {
             --bg: #f2f2f7;
             --card-bg: rgba(255,255,255,0.9);
@@ -27,7 +26,6 @@
             --danger: #ff3b30;
         }
 
-        /* Тёмная тема – автоматически при prefers-color-scheme или теме Telegram */
         @media (prefers-color-scheme: dark) {
             :root {
                 --bg: #000000;
@@ -52,7 +50,6 @@
             transition: background 0.2s, color 0.2s;
         }
 
-        /* Таб‑бар */
         .tabs {
             position: fixed;
             bottom: 0;
@@ -112,7 +109,6 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* Карточки */
         .card {
             background: var(--card-bg);
             backdrop-filter: blur(20px);
@@ -141,7 +137,6 @@
             font-feature-settings: "tnum";
         }
 
-        /* Время намаза */
         .prayer-time {
             display: flex;
             justify-content: space-between;
@@ -173,7 +168,6 @@
             vertical-align: middle;
         }
 
-        /* Поля ввода */
         .search-row {
             display: flex;
             gap: 10px;
@@ -201,7 +195,6 @@
             color: var(--secondary-text);
         }
 
-        /* Кнопки */
         button {
             border: none;
             border-radius: 12px;
@@ -246,7 +239,6 @@
             background: rgba(118,118,128,0.2);
         }
 
-        /* Тасбих */
         .counter-display {
             font-size: 80px;
             font-weight: 700;
@@ -294,7 +286,6 @@
             border-radius: 3px;
         }
 
-        /* Настройки */
         .setting-item {
             display: flex;
             justify-content: space-between;
@@ -349,7 +340,6 @@
             transform: translateX(20px);
         }
 
-        /* Вспомогательное */
         .debug-info {
             font-size: 12px;
             color: var(--secondary-text);
@@ -396,7 +386,6 @@
     </style>
 </head>
 <body>
-    <!-- Нижний таб‑бар iOS -->
     <div class="tabs">
         <div class="tab active" onclick="switchTab(event, 'prayer')">
             <span>🕌</span>
@@ -427,7 +416,7 @@
             <div class="card">
                 <h2>📍 Определение местоположения</h2>
                 <div class="search-row">
-                    <input type="text" id="cityInput" placeholder="Город (например, Baku)">
+                    <input type="text" id="cityInput" placeholder="Город (например, Baku, Qusar)">
                     <button class="btn-outline" onclick="geocodeAndFetchCity()">Найти</button>
                 </div>
                 <div style="display: flex; gap: 10px; margin-bottom: 8px;">
@@ -448,7 +437,7 @@
                 
                 <div class="warning">
                     ⏰ Уведомления приходят <strong>точно во время намаза</strong> (по местному времени города).<br>
-                    🕌 Мазхаб: Шафиитский (Аср).
+                    🕌 Мазхаб: Шафиитский (Аср) | Метод: 14 (Россия/Кавказ)
                 </div>
                 
                 <div style="margin: 16px 0;">
@@ -564,19 +553,19 @@
 
             <div class="card">
                 <h2>⚙️ Параметры расчёта</h2>
-                <div style="margin-bottom: 8px; color: var(--text);">Метод: 14 (Россия/Кавказ)</div>
-                <div style="color: var(--secondary-text); font-size: 15px;">Мазхаб: Шафиитский (фиксирован)</div>
+                <div style="margin-bottom: 8px; color: var(--text);">Метод: 14 (Россия/Кавказ) — фиксирован</div>
+                <div style="color: var(--secondary-text); font-size: 15px;">Мазхаб: Шафиитский (Аср) — фиксирован</div>
             </div>
 
             <div class="card">
                 <h2>ℹ️ О приложении</h2>
                 <p style="color: var(--text); line-height: 1.5;">
                     Точное время намаза по методу 14 (Россия/Кавказ), шафиитский мазхаб.<br>
-                    Геолокация, ручной поиск, тасбих, уведомления.<br>
+                    Геолокация, ручной поиск (с точными координатами для Кусаров), тасбих, уведомления.<br>
                     Последний выбранный город сохраняется автоматически.
                 </p>
                 <div style="margin-top: 16px; padding-top: 16px; border-top: 0.5px solid var(--border); color: var(--secondary-text); font-size: 13px;">
-                    Версия 5.0 (шафии + тёмная тема)<br>
+                    Версия 6.0 (финальная, точная)<br>
                     © 2025 Muslim App
                 </div>
             </div>
@@ -587,12 +576,12 @@
         const tg = window.Telegram.WebApp;
         tg.expand();
 
-        // Принудительно применяем тему Telegram (если доступна)
+        // Принудительно применяем тему Telegram
         if (tg.themeParams && tg.themeParams.bg_color) {
             document.documentElement.style.setProperty('--bg', tg.themeParams.bg_color);
             document.documentElement.style.setProperty('--text', tg.themeParams.text_color);
             document.documentElement.style.setProperty('--accent', tg.themeParams.button_color);
-            // и т.д. – можно расширить, но оставим автоматику
+            document.documentElement.style.setProperty('--border', tg.themeParams.hint_color || 'rgba(84,84,88,0.2)');
         }
 
         // --- Глобальные переменные ---
@@ -601,6 +590,7 @@
         let foundTimezone = '';
         let foundCityName = '';
         const SCHOOL = 0; // 0 = Шафии (жёстко)
+        const METHOD = 14; // 14 = Россия/Кавказ (жёстко)
 
         // Тасбих
         let counter = parseInt(localStorage.getItem('tasbihCounter') || '0');
@@ -650,13 +640,12 @@
             if (saved) {
                 try {
                     const data = JSON.parse(saved);
-                    // Если прошло больше 24 часов – лучше обновить, но пока просто загружаем
                     fetchPrayerTimesByCoords(data.lat, data.lon, data.cityName);
                 } catch (e) {
                     console.warn('Ошибка загрузки сохранённой локации', e);
+                    setTimeout(() => getLocationAndFetchTimes(), 1000);
                 }
             } else {
-                // Если нет сохранённого – запускаем авто-GPS через 1 сек
                 setTimeout(() => getLocationAndFetchTimes(), 1000);
             }
         }
@@ -669,8 +658,6 @@
             document.getElementById('savedCityInfo').style.display = 'none';
             document.getElementById('geoStatus').innerHTML = '🔄 Местоположение сброшено. Выберите город.';
             document.getElementById('geoStatus').style.color = 'var(--secondary-text)';
-            // Предложим авто-GPS
-            getLocationAndFetchTimes();
         }
 
         // --- GPS ---
@@ -701,13 +688,13 @@
             );
         }
 
-        // --- Универсальный запрос времени по координатам (шафиитский мазхаб) ---
+        // --- Универсальный запрос времени по координатам (method=14, school=0) ---
         async function fetchPrayerTimesByCoords(lat, lon, displayName) {
             try {
                 const date = new Date();
                 const dateStr = `${date.getDate().toString().padStart(2,'0')}-${(date.getMonth()+1).toString().padStart(2,'0')}-${date.getFullYear()}`;
-                // school = 0 (шафии)
-                const url = `https://api.aladhan.com/v1/timings/${dateStr}?latitude=${lat}&longitude=${lon}&method=14&school=${SCHOOL}`;
+                // ✅ ЖЁСТКО: method=14, school=0
+                const url = `https://api.aladhan.com/v1/timings/${dateStr}?latitude=${lat}&longitude=${lon}&method=${METHOD}&school=${SCHOOL}`;
                 
                 const res = await fetch(url);
                 const data = await res.json();
@@ -723,7 +710,7 @@
                         📍 ${lat.toFixed(4)}, ${lon.toFixed(4)}<br>
                         🌍 ${foundTimezone}<br>
                         📅 ${date.toLocaleDateString('ru-RU')}<br>
-                        🕌 Мазхаб: Шафии
+                        🕌 Мазхаб: Шафии | Метод: 14
                     `;
                     
                     document.getElementById('timeFajr').innerText = data.data.timings.Fajr;
@@ -736,7 +723,6 @@
                     document.getElementById('geoStatus').innerHTML = '✅ Время намаза загружено';
                     document.getElementById('geoStatus').style.color = 'var(--success)';
                     
-                    // Сохраняем в localStorage
                     saveLocationToStorage(lat, lon, foundTimezone, displayName);
                     
                     tg.HapticFeedback.notificationOccurred('success');
@@ -750,17 +736,47 @@
             }
         }
 
-        // --- Геокодинг (ручной поиск города) ---
+        // --- ГЕОКОДИНГ С ХАРДКОДОМ ТОЧНЫХ КООРДИНАТ ---
         async function geocodeAndFetchCity() {
-            const city = document.getElementById('cityInput').value.trim();
+            let city = document.getElementById('cityInput').value.trim();
             if (!city) {
                 tg.showAlert('Введите название города');
                 return;
             }
+
             const status = document.getElementById('geoStatus');
             status.innerHTML = `🔍 Ищем "${city}"...`;
             status.style.color = 'var(--accent)';
             
+            // === ТОЧНЫЕ КООРДИНАТЫ ДЛЯ ИЗВЕСТНЫХ ГОРОДОВ ===
+            const exactCoordinates = {
+                'кусары': { lat: 41.4288, lon: 48.4378, name: 'Кусары' },
+                'qusar': { lat: 41.4288, lon: 48.4378, name: 'Qusar' },
+                'самур': { lat: 41.6325, lon: 48.4302, name: 'Самур' },
+                'samur': { lat: 41.6325, lon: 48.4302, name: 'Samur' },
+                'баку': { lat: 40.4093, lon: 49.8671, name: 'Баку' },
+                'baku': { lat: 40.4093, lon: 49.8671, name: 'Baku' },
+                'махачкала': { lat: 42.9849, lon: 47.5046, name: 'Махачкала' },
+                'makhachkala': { lat: 42.9849, lon: 47.5046, name: 'Makhachkala' },
+                'дербент': { lat: 42.0575, lon: 48.2772, name: 'Дербент' },
+                'derbent': { lat: 42.0575, lon: 48.2772, name: 'Derbent' },
+                'ганжа': { lat: 40.6828, lon: 46.3606, name: 'Гянджа' },
+                'ganja': { lat: 40.6828, lon: 46.3606, name: 'Ganja' },
+                'сумгаит': { lat: 40.5897, lon: 49.6686, name: 'Сумгаит' },
+                'sumgait': { lat: 40.5897, lon: 49.6686, name: 'Sumgait' }
+            };
+
+            const cityLower = city.toLowerCase();
+            
+            // Если город есть в хардкоде — используем точные координаты
+            if (exactCoordinates[cityLower]) {
+                const coords = exactCoordinates[cityLower];
+                status.innerHTML = `✅ Найден: ${coords.name} (точные координаты). Загружаем время...`;
+                await fetchPrayerTimesByCoords(coords.lat, coords.lon, coords.name);
+                return;
+            }
+            
+            // === ОБЫЧНЫЙ ГЕОКОДИНГ ДЛЯ ОСТАЛЬНЫХ ГОРОДОВ ===
             try {
                 const geoRes = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(city)}&limit=1`, {
                     headers: { 'User-Agent': 'MuslimApp-Telegram/1.0' }
@@ -778,13 +794,13 @@
                     tg.showAlert('Город не найден');
                 }
             } catch (e) {
-                console.error(e);
+                console.error('Ошибка геокодинга:', e);
                 status.innerHTML = '❌ Ошибка геокодинга';
                 status.style.color = 'var(--danger)';
             }
         }
 
-        // --- Сохранение в бота (передаём school=0) ---
+        // --- Сохранение в бота ---
         function saveToBot() {
             if (foundLat === 0) {
                 tg.showAlert('Сначала определите местоположение или город');
@@ -797,7 +813,8 @@
                 lon: foundLon,
                 offset: offset,
                 timezone: foundTimezone,
-                school: SCHOOL   // 0 = шафии
+                school: SCHOOL,   // 0 = шафии
+                method: METHOD    // 14 = Россия/Кавказ
             }));
             tg.close();
         }
